@@ -28,4 +28,76 @@
 </head>
 <body>
   <h1 id="date"></h1>
-  <h2 id="time
+  <h2 id="time"></h2>
+  <div class="small">Calendrier Terrestre Universel (CTU)</div>
+
+  <script>
+    const moisCTU = [
+      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
+      "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
+    ];
+
+    const SPINION_DURATION = 86400;       // 1 jour = 86400 s
+    const LUNITION_DURATION = 29.53059 * SPINION_DURATION;
+    const ORBION_DURATION = 365.2422 * SPINION_DURATION;
+
+    // --- Conversion en Jour Julien ---
+    function toJulianDate(date) {
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth() + 1;
+      const day = date.getUTCDate() +
+                  date.getUTCHours()/24 +
+                  date.getUTCMinutes()/1440 +
+                  date.getUTCSeconds()/86400 +
+                  date.getUTCMilliseconds()/86400000;
+
+      let Y = year;
+      let M = month;
+      if (M <= 2) { Y -= 1; M += 12; }
+
+      const A = Math.floor(Y/100);
+      const B = 2 - A + Math.floor(A/4);
+
+      // Formule JDN (valide pour années négatives)
+      return Math.floor(365.25*(Y+4716)) + Math.floor(30.6001*(M+1)) + day + B - 1524.5;
+    }
+
+    // Jour Julien de l'origine CTU : 15 juin -763 à midi UT
+    const ORIGIN_JD = toJulianDate(new Date(Date.UTC(-762, 5, 15, 12, 0, 0)));
+
+    function updateCTU() {
+      const now = new Date();
+      const jdNow = toJulianDate(now);
+      const elapsedSeconds = (jdNow - ORIGIN_JD) * SPINION_DURATION;
+
+      // Décomposition CTU
+      const orbion = Math.floor(elapsedSeconds / ORBION_DURATION);
+      const secondsInOrbion = elapsedSeconds % ORBION_DURATION;
+
+      const lunition = Math.floor(secondsInOrbion / LUNITION_DURATION);
+      const secondsInLunition = secondsInOrbion % LUNITION_DURATION;
+
+      const spinion = Math.floor(secondsInLunition / SPINION_DURATION);
+      const secondsInSpinion = secondsInLunition % SPINION_DURATION;
+
+      // Horloge CTU (hh:mm:ss)
+      const spinor = Math.floor((secondsInSpinion / SPINION_DURATION) * 20);
+      const minor = Math.floor(((secondsInSpinion / SPINION_DURATION) * 2000) % 100);
+      const secor = Math.floor(((secondsInSpinion / SPINION_DURATION) * 200000) % 100);
+
+      // Format lisible
+      const day = spinion + 1;
+      const monthName = moisCTU[lunition % 13];
+      const year = orbion;
+
+      document.getElementById("date").textContent = `${day} ${monthName} ${year}`;
+      document.getElementById("time").textContent =
+        `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
+
+      requestAnimationFrame(updateCTU);
+    }
+
+    updateCTU();
+  </script>
+</body>
+</html>
