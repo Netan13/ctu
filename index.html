@@ -65,7 +65,8 @@
     <span id="orbion"></span>
   </div>
   <div class="mark">* <span id="mark">after Bur-Sagale eclipse</span></div>
-  <div><p><span id="spinor"></span>:<span id="minor"></span>:<span id="secor"></span></p></div>
+  <div><p><span id="spinor"></span>:<span id="minor"></span>:<span id="secor"></span> CTU</p></div>
+  <div><p><span id="hours"></span>:<span id="minutes"></span>:<span id="secondes"></span> Heure Locale</p></div>
   <script>
     // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
     // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
@@ -89,7 +90,7 @@
     })();
     
     // --- Conversion en Jour Julien ---
-    function toJulianDate(date = new Date()) {
+    function toJulianDate(date) {
       let year = date.getUTCFullYear();
       let month = date.getUTCMonth() + 1;
       let day = date.getUTCDate() +
@@ -109,7 +110,8 @@
     }
 
     function updateCTU() {
-      let jdNow = toJulianDate();
+      let date = new Date();
+      let jdNow = toJulianDate(date);
       let elapsedDays = jdNow - ORIGIN_JD;
       let elapsedSeconds = elapsedDays * SPINION_DURATION;
 
@@ -163,6 +165,9 @@
       document.getElementById("spinor").textContent = `${spinor.toString().padStart(2,'0')}`;
       document.getElementById("minor").textContent = `${minor.toString().padStart(2,'0')}`;
       document.getElementById("secor").textContent = `${secor.toString().padStart(2,'0')}`;
+      document.getElementById("hours").textContent = `${date.getHours()}`;
+      document.getElementById("minutes").textContent = `${date.getMinutes()}`;
+      document.getElementById("secondes").textContent = `${date.getSeconds()}`;
       
       requestAnimationFrame(updateCTU);
     }
