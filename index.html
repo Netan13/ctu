@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Horloge CTU</title>
+  <title>Universal Earth Calendar (UEC)</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CTU">
@@ -35,11 +35,9 @@
 <body>
   <h1><span id="date"></span><sup id="mark">after Bur-Sagale eclipse</sup></h1>
   <h2 id="time"></h2>
-  <div id="note" class="small">Universal Earth Calendar (UEC)</div>
-
   <script>
     if (navigator.language === 'fr-FR') {
-      document.getElementById("note").textContent = 'Calendrier Terrestre Universel (CTU)';
+      document.title = 'Calendrier Terrestre Universel (CTU)';
       document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
     }
     
