@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Horloge CTU</title>
+  <style>
+    body {
+      background-color: #0b0f1c;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin: 0.2em 0;
+    }
+    h2 {
+      font-size: 1.2em;
+      font-weight: normal;
+      color: #8ab4f8;
+    }
+    @media (prefers-color-scheme: light) {
+      body {
+        background-color: #f0f0f0;
+        color: #202020;
+      }
+      h2 {
+        color: #0b57d0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="ctuDate"></h1>
+  <h2 id="ctuTime"></h2>
+  <h2 id="ctuClassic"></h2>
+
+  <script>
+    const moisCTU = [
+      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel",
+      "Cereon", "Elvora", "Zailun", "Aruel", "Thylis",
+      "Velunor", "Ombran", "Siliane"
+    ];
+
+    const spinionSeconds = 86400;
+    const lunitionDays = 29.53059;
+    const orbionDays = 365.2422;
+
+    const originJulian = -275097; // Décalage approximatif en jours par rapport à 0001-01-01
+
+    function updateCTU() {
+      const now = new Date();
+
+      // Conversion en jours depuis l'origine
+      const daysSinceEpoch = Math.floor(now.getTime() / 86400000);
+      const totalDays = daysSinceEpoch + originJulian;
+
+      // Orbion (année CTU)
+      const orbion = Math.floor(totalDays / orbionDays);
+      const dayOfOrbion = totalDays % orbionDays;
+
+      // Mois CTU simplifié (Nuiron 11j + 12x29j)
+      const monthLengths = [11, ...Array(12).fill(29)];
+      let dayCount = Math.floor(dayOfOrbion);
+      let month = 0;
+      while (dayCount >= monthLengths[month]) {
+        dayCount -= monthLengths[month];
+        month++;
+        if (month >= moisCTU.length) month = moisCTU.length - 1;
+      }
+
+      const day = dayCount + 1;
+
+      // Heure CTU (Spinor/Minor/Secor)
+      const secondsToday = now.getUTCHours()*3600 + now.getUTCMinutes()*60 + now.getUTCSeconds();
+      const spinor = Math.floor((secondsToday / spinionSeconds) * 20);
+      const minor = Math.floor(((secondsToday / spinionSeconds) * 2000) % 100);
+      const secor = Math.floor(((secondsToday / spinionSeconds) * 200000) % 100);
+
+      // Formats d'affichage
+      document.getElementById("ctuDate").innerText = `${day} ${moisCTU[month]} ${orbion}`;
+      document.getElementById("ctuTime").innerText = `${spinor} Spinor ${minor} Minor ${secor} Secor`;
+      document.getElementById("ctuClassic").innerText = `${day} ${moisCTU[month]} ${orbion}, ${String(spinor).padStart(2,'0')}:${String(minor).padStart(2,'0')}:${String(secor).padStart(2,'0')} CTU`;
+    }
+
+    setInterval(updateCTU, 1000);
+    updateCTU();
+  </script>
+</body>
+</html>
