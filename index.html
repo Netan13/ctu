@@ -35,9 +35,13 @@
 <body>
   <h1 id="date"></h1>
   <h2 id="time"></h2>
-  <div class="small">Calendrier Terrestre Universel (CTU)</div>
+  <div id="title" class="small">Universal Earth Calendar (UEC)</div>
 
   <script>
+    if (navigator.language === 'fr-FR') {
+      document.getElementById("title").textContent = 'Calendrier Terrestre Universel (CTU)';
+    }
+    
     const moisCTU = [
       "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
       "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
