@@ -166,9 +166,9 @@
       document.getElementById("spinor").textContent = `${spinor.toString().padStart(2,'0')}`;
       document.getElementById("minor").textContent = `${minor.toString().padStart(2,'0')}`;
       document.getElementById("secor").textContent = `${secor.toString().padStart(2,'0')}`;
-      document.getElementById("hours").textContent = `${date.getHours()}`;
-      document.getElementById("minutes").textContent = `${date.getMinutes()}`;
-      document.getElementById("secondes").textContent = `${date.getSeconds()}`;
+      document.getElementById("hours").textContent = `${date.getHours().toString().padStart(2,'0')}`;
+      document.getElementById("minutes").textContent = `${date.getMinutes().toString().padStart(2,'0')}`;
+      document.getElementById("secondes").textContent = `${date.getSeconds().toString().padStart(2,'0')}`;
       
       requestAnimationFrame(updateCTU);
     }
