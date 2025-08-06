@@ -11,35 +11,47 @@
   <link rel="icon" type="image/ico" sizes="512x512" href="icon-512.ico">
 
   <style>
-    body {
+    html {
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      display: grid;
-      grid-template:
-        "a b c" 1fr
-        "d e e" 1fr
-        "f g h" 1fr;
-      row-gap: 1em;
-      height: 100%;
-      width: 100%;
-      padding: 0;
-      margin: 0;
       transition: background 0.3s, color 0.3s;
+      height: 100%;
     }
-    div::first-child {
-      column-gap: 20px;
+    body {
+      height: 100%;
+      width: fit-content;
+      display: flex;
+      flex-flow: column;
+      row-gap: 2em;
+      margin: auto;
+    }
+    div {
+      display: inline-flex;
+      justify-content: center;
+      column-gap: 10px;
+    }
+    p {
+      margin: 0;
+    }
+    .small {
+      font-size: x-small;
     }
     @media (prefers-color-scheme: dark) {
-      body { background: #121212; color: #e0e0e0; }
+      html { background: #121212; color: #e0e0e0; }
     }
     @media (prefers-color-scheme: light) {
-      body { background: #ffffff; color: #222222; }
+      html { background: #ffffff; color: #222222; }
     }
   </style>
 </head>
 <body>
-  <div><span id="spinion"></span><span id="lunition"></span><span id="orbion"></span></div>
-  <div><span id="month"></span><span id="mark">after Bur-Sagale eclipse</span></div>
-  <div><span id="spinor"></span>:<span id="minor"></span>:<span id="secor"></span></div>
+  <div>
+    <span id="spinion"></span>
+    <span id="lunition"></span>
+    <sup id="month"></sup>
+    <span id="orbion"></span>
+  </div>
+  <div class="small">* <span id="mark">after Bur-Sagale eclipse</span></div>
+  <div><p><span id="spinor"></span>:<span id="minor"></span>:<span id="secor"></span></p></div>
   <script>
     // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
     // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
