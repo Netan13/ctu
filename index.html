@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Universal Earth Calendar (UEC)</title>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="CTU">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-title" content="CTU">
   <link rel="apple-touch-icon" href="icon-512.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
@@ -37,6 +37,27 @@
   <h1><span id="date"></span><span id="mark">after Bur-Sagale eclipse</sup></h1>
   <h2 id="time"></h2>
   <script>
+    // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
+    // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
+    // The first precisely dated astronomical event
+    const originDateUEC = new Date(Date.UTC(-762, 5, 15, 9, 0, 0)); 
+    const ORIGIN_JD = toJulianDate(originDateUEC);
+    const LUNITIONS = [
+      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
+      "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
+    ];
+    const NUIRON_DURATION = 11;
+    const LUNITION_DURATION = 29;
+    const SPINION_DURATION = 86400;
+    
+    (function() {
+      if (navigator.language === 'fr-FR') {
+        document.title = 'Calendrier Terrestre Universel (CTU)';
+        document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
+      }
+      updateCTU();
+    })();
+    
     // --- Conversion en Jour Julien ---
     function toJulianDate(date = new Date()) {
       let year = date.getUTCFullYear();
@@ -96,7 +117,7 @@
       }
       lunition %= 13;
 
-      let monthName = lunition === 0 ? "" : "<span class='small'(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' } + "</span>)";
+      let monthName = lunition === 0 ? "" : "<span class='small'(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + "</span>)";
       monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
       let lunitionName = LUNITIONS[lunition] + monthName;
 
@@ -112,27 +133,6 @@
 
       requestAnimationFrame(updateCTU);
     }
-    
-    // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
-    // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
-    // The first precisely dated astronomical event
-    const originDateUEC = new Date(Date.UTC(-762, 5, 15, 9, 0, 0)); 
-    const ORIGIN_JD = toJulianDate(originDateUEC);
-    const LUNITIONS = [
-      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
-      "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
-    ];
-    const NUIRON_DURATION = 11;
-    const LUNITION_DURATION = 29;
-    const SPINION_DURATION = 86400;
-    
-    (function() {
-      if (navigator.language === 'fr-FR') {
-        document.title = 'Calendrier Terrestre Universel (CTU)';
-        document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
-      }
-      updateCTU();
-    })();
   </script>
 </body>
 </html>
