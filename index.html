@@ -78,7 +78,7 @@
     const ORIGIN_JD = toJulianDate(originDateUEC);
 
     function updateCTU() {
-      let jdNow = toJulianDate(now);
+      let jdNow = toJulianDate();
       let elapsedDays = jdNow - ORIGIN_JD;
       let elapsedSeconds = elapsedDays * SPINION_DURATION;
 
@@ -117,7 +117,7 @@
 
       //const lunitionName = LUNITIONS[lunition % 13];
       lunition %= 13;
-      let lunitionName = lunition===0 ? 'Nuiron' : (new Date(2000, lunition-1, 10)).toLocaleDateString(navigator.language, { lunition: 'long' });
+      let lunitionName = lunition===0 ? 'Nuiron' : (new Date(2000, lunition-1, 10)).toLocaleDateString(navigator.language, { month: 'long' });
       lunitionName = lunitionName.charAt(0).toUpperCase() + lunitionName.slice(1);
 
       // UEC Time (Spinor/Minor/Secor)
