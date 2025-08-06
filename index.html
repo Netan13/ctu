@@ -13,13 +13,20 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      display: grid;
+      grid-template:
+        "a b c" 1fr
+        "d e e" 1fr
+        "f g h" 1fr;
+      row-gap: 1em;
+      height: 100%;
+      width: 100%;
+      padding: 0;
       margin: 0;
       transition: background 0.3s, color 0.3s;
+    }
+    div::first-child {
+      column-gap: 20px;
     }
     @media (prefers-color-scheme: dark) {
       body { background: #121212; color: #e0e0e0; }
