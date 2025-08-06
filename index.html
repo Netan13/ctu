@@ -119,7 +119,7 @@
 
       let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
       monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-      let lunitionName = LUNITIONS[lunition] + monthName;
+      let lunitionName = LUNITIONS[lunition];
 
       // UEC Time (Spinor/Minor/Secor)
       let secondsToSpinion = (elapsedSeconds % SPINION_DURATION);
