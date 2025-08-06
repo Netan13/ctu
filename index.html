@@ -37,27 +37,6 @@
   <h1><span id="date"></span><span id="mark">after Bur-Sagale eclipse</sup></h1>
   <h2 id="time"></h2>
   <script>
-    // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
-    // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
-    // The first precisely dated astronomical event
-    const originDateUEC = new Date(Date.UTC(-762, 5, 15, 9, 0, 0)); 
-    const ORIGIN_JD = toJulianDate(originDateUEC);
-    const LUNITIONS = [
-      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
-      "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
-    ];
-    const NUIRON_DURATION = 11;
-    const LUNITION_DURATION = 29;
-    const SPINION_DURATION = 86400;
-    
-    (function() {
-      if (navigator.language === 'fr-FR') {
-        document.title = 'Calendrier Terrestre Universel (CTU)';
-        document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
-      }
-      updateCTU();
-    })();
-
     // --- Conversion en Jour Julien ---
     function toJulianDate(date = new Date()) {
       let year = date.getUTCFullYear();
@@ -133,6 +112,27 @@
 
       requestAnimationFrame(updateCTU);
     }
+    
+    // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
+    // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
+    // The first precisely dated astronomical event
+    const originDateUEC = new Date(Date.UTC(-762, 5, 15, 9, 0, 0)); 
+    const ORIGIN_JD = toJulianDate(originDateUEC);
+    const LUNITIONS = [
+      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
+      "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
+    ];
+    const NUIRON_DURATION = 11;
+    const LUNITION_DURATION = 29;
+    const SPINION_DURATION = 86400;
+    
+    (function() {
+      if (navigator.language === 'fr-FR') {
+        document.title = 'Calendrier Terrestre Universel (CTU)';
+        document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
+      }
+      updateCTU();
+    })();
   </script>
 </body>
 </html>
