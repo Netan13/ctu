@@ -34,7 +34,7 @@
   </style>
 </head>
 <body>
-  <h1><span id="date"></span><span id="mark">after Bur-Sagale eclipse</sup></h1>
+  <h1><span id="date"></span><span id="month" class="small"></span><span id="mark">after Bur-Sagale eclipse</span></h1>
   <h2 id="time"></h2>
   <script>
     // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
@@ -117,7 +117,7 @@
       }
       lunition %= 13;
 
-      let monthName = lunition === 0 ? "" : "<span class='small'>(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + "</span>)";
+      let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
       monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
       let lunitionName = LUNITIONS[lunition] + monthName;
 
@@ -128,6 +128,7 @@
       let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
 
       document.getElementById("date").textContent = `${spinion} ${lunitionName} ${orbion}`;
+      document.getElementById("month").textContent = `${monthName}`;
       document.getElementById("time").textContent =
         `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}`;
 
