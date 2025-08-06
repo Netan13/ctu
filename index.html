@@ -117,7 +117,7 @@
       }
       lunition %= 13;
 
-      let monthName = lunition === 0 ? "" : "<span class='small'(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + "</span>)";
+      let monthName = lunition === 0 ? "" : "<span class='small'>(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + "</span>)";
       monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
       let lunitionName = LUNITIONS[lunition] + monthName;
 
