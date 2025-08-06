@@ -2,94 +2,96 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Horloge CTU</title>
   <style>
     body {
-      background-color: #0b0f1c;
-      color: #e0e0e0;
       font-family: 'Segoe UI', Tahoma, sans-serif;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      text-align: center;
-      transition: background-color 0.5s, color 0.5s;
+      margin: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #121212;
+        color: #e0e0e0;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      body {
+        background: #ffffff;
+        color: #222222;
+      }
     }
     h1 {
       font-size: 2.5em;
       margin: 0.2em 0;
     }
     h2 {
-      font-size: 1.2em;
-      font-weight: normal;
-      color: #8ab4f8;
+      font-size: 1.5em;
+      margin: 0.2em 0;
     }
-    @media (prefers-color-scheme: light) {
-      body {
-        background-color: #f0f0f0;
-        color: #202020;
-      }
-      h2 {
-        color: #0b57d0;
-      }
+    .small {
+      font-size: 0.9em;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
-  <h1 id="ctuDate"></h1>
-  <h2 id="ctuTime"></h2>
-  <h2 id="ctuClassic"></h2>
+  <h1 id="date"></h1>
+  <h2 id="time"></h2>
+  <div class="small">Calendrier Terrestre Universel (CTU)</div>
 
   <script>
     const moisCTU = [
-      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel",
-      "Cereon", "Elvora", "Zailun", "Aruel", "Thylis",
-      "Velunor", "Ombran", "Siliane"
+      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
+      "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
     ];
 
-    const spinionSeconds = 86400;
-    const lunitionDays = 29.53059;
-    const orbionDays = 365.2422;
+    const SPINION_DURATION = 86400;       // 1 jour = 86400 s
+    const LUNITION_DURATION = 29.53059 * SPINION_DURATION;
+    const ORBION_DURATION = 365.2422 * SPINION_DURATION;
 
-    const originJulian = -275097; // Décalage approximatif en jours par rapport à 0001-01-01
+    // Origine : 15 juin -763 ~ Bur-Sagale
+    // On va approximer en prenant un offset en jours par rapport à l'époque actuelle
+    const daysSinceOrigin = 1019155; // Approximation fixe pour 2025
+    const secondsSinceOrigin = daysSinceOrigin * SPINION_DURATION;
 
     function updateCTU() {
       const now = new Date();
+      const utcSecondsToday = now.getUTCHours()*3600 + now.getUTCMinutes()*60 + now.getUTCSeconds() + now.getUTCMilliseconds()/1000;
+      const elapsed = secondsSinceOrigin + (now.getTime()/1000 - now.getTimezoneOffset()*60);
 
-      // Conversion en jours depuis l'origine
-      const daysSinceEpoch = Math.floor(now.getTime() / 86400000);
-      const totalDays = daysSinceEpoch + originJulian;
+      // Décomposition CTU
+      const orbion = Math.floor(elapsed / ORBION_DURATION);
+      const secondsInOrbion = elapsed % ORBION_DURATION;
 
-      // Orbion (année CTU)
-      const orbion = Math.floor(totalDays / orbionDays);
-      const dayOfOrbion = totalDays % orbionDays;
+      let lunition = Math.floor(secondsInOrbion / LUNITION_DURATION);
+      const secondsInLunition = secondsInOrbion % LUNITION_DURATION;
 
-      // Mois CTU simplifié (Nuiron 11j + 12x29j)
-      const monthLengths = [11, ...Array(12).fill(29)];
-      let dayCount = Math.floor(dayOfOrbion);
-      let month = 0;
-      while (dayCount >= monthLengths[month]) {
-        dayCount -= monthLengths[month];
-        month++;
-        if (month >= moisCTU.length) month = moisCTU.length - 1;
-      }
+      let spinion = Math.floor(secondsInLunition / SPINION_DURATION);
+      const secondsInSpinion = secondsInLunition % SPINION_DURATION;
 
-      const day = dayCount + 1;
+      // Horloge classique CTU (h:m:s)
+      const spinor = Math.floor((secondsInSpinion / SPINION_DURATION) * 20);
+      const minor = Math.floor(((secondsInSpinion / SPINION_DURATION) * 2000) % 100);
+      const secor = Math.floor(((secondsInSpinion / SPINION_DURATION) * 200000) % 100);
 
-      // Heure CTU (Spinor/Minor/Secor)
-      const secondsToday = now.getUTCHours()*3600 + now.getUTCMinutes()*60 + now.getUTCSeconds();
-      const spinor = Math.floor((secondsToday / spinionSeconds) * 20);
-      const minor = Math.floor(((secondsToday / spinionSeconds) * 2000) % 100);
-      const secor = Math.floor(((secondsToday / spinionSeconds) * 200000) % 100);
+      // Date lisible
+      const day = spinion + 1; // jour humain
+      const monthName = moisCTU[(lunition % 13)];
+      const year = orbion;
 
-      // Formats d'affichage
-      document.getElementById("ctuDate").innerText = `${day} ${moisCTU[month]} ${orbion}`;
-      document.getElementById("ctuTime").innerText = `${spinor} Spinor ${minor} Minor ${secor} Secor`;
-      document.getElementById("ctuClassic").innerText = `${day} ${moisCTU[month]} ${orbion}, ${String(spinor).padStart(2,'0')}:${String(minor).padStart(2,'0')}:${String(secor).padStart(2,'0')} CTU`;
+      document.getElementById("date").textContent = `${day} ${monthName} ${year}`;
+      document.getElementById("time").textContent = `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
+
+      requestAnimationFrame(updateCTU);
     }
 
-    setInterval(updateCTU, 1000);
     updateCTU();
   </script>
 </body>
