@@ -114,6 +114,7 @@
       //const monthName = moisCTU[month % 13];
       month %= 13;
       const monthName = month===0 ? 'Nuiron' : (new Date(2000, month-1, 10)).toLocaleString(navigator.language, { month: 'long' });
+      monthName = String(monthName).charAt(0).toUpperCase() + String(monthName).slice(1);
 
       // Heure CTU (Spinor/Minor/Secor)
       const secondsToday = (elapsedSeconds % SPINION_DURATION);
