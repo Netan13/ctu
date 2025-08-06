@@ -42,20 +42,20 @@
       document.getElementById("title").textContent = 'Calendrier Terrestre Universel (CTU)';
     }
     
-    const moisCTU = [
+    const LUNITIONS = [
       "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
       "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
     ];
 
-    const SPINION_DURATION = 86400; // secondes
-    const MOIS0_JOURS = 11;         // Nuiron
-    const MOIS_JOURS = 29;          // mois normaux
+    const SPINION_DURATION = 86400;
+    const NUIRON_DURATION = 11;
+    const LUNITION_DURATION = 29;
 
     // --- Conversion en Jour Julien ---
-    function toJulianDate(date) {
-      const year = date.getUTCFullYear();
-      const month = date.getUTCMonth() + 1;
-      const day = date.getUTCDate() +
+    function toJulianDate(date = new Date()) {
+      let year = date.getUTCFullYear();
+      let month = date.getUTCMonth() + 1;
+      let day = date.getUTCDate() +
                   date.getUTCHours()/24 +
                   date.getUTCMinutes()/1440 +
                   date.getUTCSeconds()/86400 +
@@ -65,68 +65,68 @@
       let M = month;
       if (M <= 2) { Y -= 1; M += 12; }
 
-      const A = Math.floor(Y/100);
-      const B = 2 - A + Math.floor(A/4);
+      let A = Math.floor(Y/100);
+      let B = 2 - A + Math.floor(A/4);
 
       return Math.floor(365.25*(Y+4716)) + Math.floor(30.6001*(M+1)) + day + B - 1524.5;
     }
 
-    // Origine CTU : 15 juin -763 12:00 GMT+3 ≈ 09:00 UTC
-    const originDateUTC = new Date(Date.UTC(-762, 5, 15, 9, 0, 0)); 
-    const ORIGIN_JD = toJulianDate(originDateUTC);
+    // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
+    // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
+    // The first precisely dated astronomical event
+    const originDateUEC = new Date(Date.UTC(-762, 5, 15, 9, 0, 0)); 
+    const ORIGIN_JD = toJulianDate(originDateUEC);
 
     function updateCTU() {
-      const now = new Date();
-      const jdNow = toJulianDate(now);
-      const elapsedDays = jdNow - ORIGIN_JD;
-      const elapsedSeconds = elapsedDays * SPINION_DURATION;
+      let jdNow = toJulianDate(now);
+      let elapsedDays = jdNow - ORIGIN_JD;
+      let elapsedSeconds = elapsedDays * SPINION_DURATION;
 
-      // --- Calcul année sociale ---
-      let year = Math.floor(elapsedDays / 365.2422);
-      let dayOfYear = Math.floor(elapsedDays % 365.2422);
+      // --- Calcul Orbion ---
+      let orbion = Math.floor(elapsedDays / 365.2422);
+      let spinionOfOrbion = Math.floor(elapsedDays % 365.2422);
 
-      let month, day;
-      if (year === 0 && dayOfYear === 0) {
+      let lunition, spinion;
+      if (orbion === 0 && spinionOfOrbion === 0) {
         // Instant 0 : 1/1/0
-        month = 1;
-        day = 1;
+        lunition = 1;
+        spinion = 1;
       } else {
         if (year > 0) {
-          // Années normales : Nuiron existe
-          if (dayOfYear < MOIS0_JOURS) {
-            month = 0;
-            day = dayOfYear; // jour 0 inclus
+          // Usual Orbion : Nuiron exist
+          if (spinionOfOrbion < NUIRON_DURATION) {
+            lunition = 0;
+            spinion = spinionOfOrbion; // with spinion 0
           } else {
-            dayOfYear -= MOIS0_JOURS;
-            month = Math.floor(dayOfYear / MOIS_JOURS) + 1;
-            day = dayOfYear % MOIS_JOURS;
+            spinionOfOrbion -= NUIRON_DURATION;
+            lunition = Math.floor(spinionOfOrbion / LUNITION_DURATION) + 1;
+            spinion = spinionOfOrbion % LUNITION_DURATION;
           }
         } else {
-          // Année 0 après instant 0
-          month = Math.floor(dayOfYear / MOIS_JOURS) + 1;
-          day = dayOfYear % MOIS_JOURS;
+          // Orbion 0 after instant 0
+          lunition = Math.floor(spinionOfOrbion / LUNITION_DURATION) + 1;
+          spinion = spinionOfOrbion % LUNITION_DURATION;
         }
 
-        // Jour 0 si divisible exact
-        if (day === 0) {
-          day = 0; // jour d'ajustement
+        if (spinion === 0) {
+          spinion = 0;
         } else {
-          day += 1; // sinon on commence à 1
+          spinion += 1; 
         }
       }
 
-      //const monthName = moisCTU[month % 13];
-      month %= 13;
-      const monthName = month===0 ? 'Nuiron' : (new Date(2000, month-1, 10)).toLocaleString(navigator.language, { month: 'long' });
-      monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+      //const lunitionName = LUNITIONS[lunition % 13];
+      lunition %= 13;
+      let lunitionName = lunition===0 ? 'Nuiron' : (new Date(2000, lunition-1, 10)).toLocaleDateString(navigator.language, { lunition: 'long' });
+      lunitionName = lunitionName.charAt(0).toUpperCase() + lunitionName.slice(1);
 
-      // Heure CTU (Spinor/Minor/Secor)
-      const secondsToday = (elapsedSeconds % SPINION_DURATION);
-      const spinor = Math.floor((secondsToday / SPINION_DURATION) * 20);
-      const minor = Math.floor(((secondsToday / SPINION_DURATION) * 2000) % 100);
-      const secor = Math.floor(((secondsToday / SPINION_DURATION) * 200000) % 100);
+      // UEC Time (Spinor/Minor/Secor)
+      let secondsToSpinion = (elapsedSeconds % SPINION_DURATION);
+      let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
+      let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
+      let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
 
-      document.getElementById("date").textContent = `${day} ${monthName} ${year}`;
+      document.getElementById("date").textContent = `${spinion} ${lunitionName} ${orbion}`;
       document.getElementById("time").textContent =
         `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
 
