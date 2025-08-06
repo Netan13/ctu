@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Horloge CTU</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CTU">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -37,9 +43,9 @@
       "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
     ];
 
-    const SPINION_DURATION = 86400;       // 1 jour = 86400 s
-    const LUNITION_DURATION = 29.53059 * SPINION_DURATION;
-    const ORBION_DURATION = 365.2422 * SPINION_DURATION;
+    const SPINION_DURATION = 86400; // secondes
+    const MOIS0_JOURS = 11;         // Nuiron
+    const MOIS_JOURS = 29;          // mois normaux
 
     // --- Conversion en Jour Julien ---
     function toJulianDate(date) {
@@ -58,37 +64,62 @@
       const A = Math.floor(Y/100);
       const B = 2 - A + Math.floor(A/4);
 
-      // Formule JDN (valide pour années négatives)
       return Math.floor(365.25*(Y+4716)) + Math.floor(30.6001*(M+1)) + day + B - 1524.5;
     }
 
-    // Jour Julien de l'origine CTU : 15 juin -763 à midi UT
-    const ORIGIN_JD = toJulianDate(new Date(Date.UTC(-762, 5, 15, 12, 0, 0)));
+    // Origine CTU : 15 juin -763 12:00 GMT+3 ≈ 09:00 UTC
+    const originDateUTC = new Date(Date.UTC(-762, 5, 15, 9, 0, 0)); 
+    const ORIGIN_JD = toJulianDate(originDateUTC);
 
     function updateCTU() {
       const now = new Date();
       const jdNow = toJulianDate(now);
-      const elapsedSeconds = (jdNow - ORIGIN_JD) * SPINION_DURATION;
+      const elapsedDays = jdNow - ORIGIN_JD;
+      const elapsedSeconds = elapsedDays * SPINION_DURATION;
 
-      // Décomposition CTU
-      const orbion = Math.floor(elapsedSeconds / ORBION_DURATION);
-      const secondsInOrbion = elapsedSeconds % ORBION_DURATION;
+      // --- Calcul année sociale ---
+      let year = Math.floor(elapsedDays / 365.2422);
+      let dayOfYear = Math.floor(elapsedDays % 365.2422);
 
-      const lunition = Math.floor(secondsInOrbion / LUNITION_DURATION);
-      const secondsInLunition = secondsInOrbion % LUNITION_DURATION;
+      let month, day;
+      if (year === 0 && dayOfYear === 0) {
+        // Instant 0 : 1/1/0
+        month = 1;
+        day = 1;
+      } else {
+        if (year > 0) {
+          // Années normales : Nuiron existe
+          if (dayOfYear < MOIS0_JOURS) {
+            month = 0;
+            day = dayOfYear; // jour 0 inclus
+          } else {
+            dayOfYear -= MOIS0_JOURS;
+            month = Math.floor(dayOfYear / MOIS_JOURS) + 1;
+            day = dayOfYear % MOIS_JOURS;
+          }
+        } else {
+          // Année 0 après instant 0
+          month = Math.floor(dayOfYear / MOIS_JOURS) + 1;
+          day = dayOfYear % MOIS_JOURS;
+        }
 
-      const spinion = Math.floor(secondsInLunition / SPINION_DURATION);
-      const secondsInSpinion = secondsInLunition % SPINION_DURATION;
+        // Jour 0 si divisible exact
+        if (day === 0) {
+          day = 0; // jour d'ajustement
+        } else {
+          day += 1; // sinon on commence à 1
+        }
+      }
 
-      // Horloge CTU (hh:mm:ss)
-      const spinor = Math.floor((secondsInSpinion / SPINION_DURATION) * 20);
-      const minor = Math.floor(((secondsInSpinion / SPINION_DURATION) * 2000) % 100);
-      const secor = Math.floor(((secondsInSpinion / SPINION_DURATION) * 200000) % 100);
+      //const monthName = moisCTU[month % 13];
+      month %= 13;
+      const monthName = month===0 ? 'Nuiron' : (new Date(2000, month-1, 10)).toLocaleString(navigator.language, { month: 'long' });
 
-      // Format lisible
-      const day = spinion + 1;
-      const monthName = moisCTU[lunition % 13];
-      const year = orbion;
+      // Heure CTU (Spinor/Minor/Secor)
+      const secondsToday = (elapsedSeconds % SPINION_DURATION);
+      const spinor = Math.floor((secondsToday / SPINION_DURATION) * 20);
+      const minor = Math.floor(((secondsToday / SPINION_DURATION) * 2000) % 100);
+      const secor = Math.floor(((secondsToday / SPINION_DURATION) * 200000) % 100);
 
       document.getElementById("date").textContent = `${day} ${monthName} ${year}`;
       document.getElementById("time").textContent =
