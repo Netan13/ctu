@@ -21,7 +21,7 @@
       width: fit-content;
       display: flex;
       flex-flow: column;
-      row-gap: 2em;
+      justify-content: center;
       margin: auto;
     }
     div {
@@ -31,9 +31,23 @@
     }
     p {
       margin: 0;
+      font-family: monospace;
+      font-size: 20pt;
     }
-    .small {
-      font-size: x-small;
+    sup {
+      font-size: 10pt;
+      font-weight: 100;
+      font-style: italic;
+    }
+    .date {
+      font-size: 30pt;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .mark {
+      margin: 5px 0 30px;
+      font-size: 8pt;
+      font-style: italic;
     }
     @media (prefers-color-scheme: dark) {
       html { background: #121212; color: #e0e0e0; }
@@ -44,13 +58,13 @@
   </style>
 </head>
 <body>
-  <div>
+  <div class="date">
     <span id="spinion"></span>
     <span id="lunition"></span>
     <sup id="month"></sup>
     <span id="orbion"></span>
   </div>
-  <div class="small">* <span id="mark">after Bur-Sagale eclipse</span></div>
+  <div class="mark">* <span id="mark">after Bur-Sagale eclipse</span></div>
   <div><p><span id="spinor"></span>:<span id="minor"></span>:<span id="secor"></span></p></div>
   <script>
     // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
@@ -134,7 +148,6 @@
       lunition %= 13;
 
       let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
-      monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
       let lunitionName = LUNITIONS[lunition];
 
       // UEC Time (Spinor/Minor/Secor)
