@@ -33,13 +33,14 @@
   </style>
 </head>
 <body>
-  <h1 id="date"></h1>
+  <h1><span id="date"></span><sup id="mark">after Bur-Sagale eclipse</sup></h1>
   <h2 id="time"></h2>
-  <div id="title" class="small">Universal Earth Calendar (UEC)</div>
+  <div id="note" class="small">Universal Earth Calendar (UEC)</div>
 
   <script>
     if (navigator.language === 'fr-FR') {
-      document.getElementById("title").textContent = 'Calendrier Terrestre Universel (CTU)';
+      document.getElementById("note").textContent = 'Calendrier Terrestre Universel (CTU)';
+      document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
     }
     
     const LUNITIONS = [
@@ -114,11 +115,11 @@
           spinion += 1; 
         }
       }
-
-      //const lunitionName = LUNITIONS[lunition % 13];
       lunition %= 13;
-      let lunitionName = lunition===0 ? 'Nuiron' : (new Date(2000, lunition-1, 10)).toLocaleDateString(navigator.language, { month: 'long' });
-      lunitionName = lunitionName.charAt(0).toUpperCase() + lunitionName.slice(1);
+
+      let monthName = lunition === 0 ? "" : "<span class='small'(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' } + "</span>)";
+      monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+      let lunitionName = LUNITIONS[lunition] + monthName;
 
       // UEC Time (Spinor/Minor/Secor)
       let secondsToSpinion = (elapsedSeconds % SPINION_DURATION);
@@ -128,7 +129,7 @@
 
       document.getElementById("date").textContent = `${spinion} ${lunitionName} ${orbion}`;
       document.getElementById("time").textContent =
-        `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
+        `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}`;
 
       requestAnimationFrame(updateCTU);
     }
