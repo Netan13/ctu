@@ -184,9 +184,9 @@
       document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${orbion}`);
       document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${lunition}`);
       document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
-      document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor}`);
-      document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor}`);
-      document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor}`);
+      document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor.toString().padStart(2,'0')}`);
+      document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor.toString().padStart(2,'0')}`);
+      document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor.toString().padStart(2,'0')}`);
       
       requestAnimationFrame(updateCTU);
     }
