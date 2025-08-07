@@ -1,208 +1,34 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <title>UEC - Universal Earth Calendar</title>
-  <link rel="apple-touch-icon" href="icon-512.ico">
-  <link rel="icon" type="image/ico" sizes="512x512" href="icon-512.ico">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="mobile-web-app-title" content="CTU">
-  <meta name="ctu-orbion" content="2739">
-  <meta name="ctu-lunition" content="4">
-  <meta name="ctu-spinion" content="27">
-  <meta name="ctu-spinor" content="19">
-  <meta name="ctu-minor" content="64">
-  <meta name="ctu-secor" content="00">
-
-  <style>
-    html {
-      font-family: 'Courier New', sans-serif, monospace;
-      transition: background 0.3s, color 0.3s;
-      height: 100%;
-    }
-    body {
-      height: 100%;
-      display: flex;
-      flex-flow: column;
-      justify-content: center;
-      margin: auto;
-    }
-    div {
-      display: inline-flex;
-      justify-content: center;
-      column-gap: 10px;
-    }
-    p {
-      margin: 0;
-      font-family: monospace;
-      font-size: 20pt;
-    }
-    sup {
-      font-size: 10pt;
-      font-weight: 100;
-      font-style: italic;
-    }
-    .date {
-      flex-wrap: wrap;
-      font-size: 30pt;
-      font-weight: 600;
-      text-transform: capitalize;
-    }
-    .mark {
-      margin: 5px 0 30px;
-      font-size: 8pt;
-      font-style: italic;
-    }
-    @media (prefers-color-scheme: dark) {
-      html { background: #121212; color: #e0e0e0; }
-    }
-    @media (prefers-color-scheme: light) {
-      html { background: #ffffff; color: #222222; }
-    }
-  </style>
+    <head>
+        <title>UEC - Universal Earth Calendar</title>
+        <link rel="apple-touch-icon" href="icon-512.ico" />
+        <link rel="icon" type="image/ico" sizes="512x512" href="icon-512.ico" />
+        <link href="index.css" rel="stylesheet" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-title" content="CTU" />
+        <meta name="ctu-orbion" content="2739" />
+        <meta name="ctu-lunition" content="4" />
+        <meta name="ctu-spinion" content="27" />
+        <meta name="ctu-spinor" content="19" />
+        <meta name="ctu-minor" content="64" />
+        <meta name="ctu-secor" content="00" />
+        <script type="text/javascript" src="index.js"></script>
 </head>
 <body>
-  <div class="date">
-    <span id="spinion">27</span>
-    <span id="lunition">Rokel</span>
-    <sup id="month">Avril</sup>
-    <span id="orbion">2739</span>
-  </div>
-  <div class="mark">* <span id="mark">after Bur-Sagale eclipse</span></div>
-  <div><p><span id="spinor">19</span>:<span id="minor">64</span>:<span id="secor">00</span> CTU</p></div>
-  <div><br /></div>
-  <div><p><span id="hours">00</span>:<span id="minutes">00</span>:<span id="secondes">00</span> Heure Locale</p></div>
-  <div id="ctu-iso" style="display:none">2739-04-27T19:64:00 CTU</div>
-  <script>
-    // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
-    // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
-    // The first precisely dated astronomical event
-    const originDateUEC = new Date(Date.UTC(-763, 5, 15, 9, 0, 0)); 
-    const ORIGIN_JD = 1446328.875;
-    const LUNITIONS = [
-      "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
-      "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
-    ];
-    const NUIRON_DURATION = 11;
-    const LUNITION_DURATION = 29;
-    const SPINION_DURATION = 86400;
-    
-    (function() {
-      if (navigator.language === 'fr-FR') {
-        document.title = "CTU - Calendrier Terrestre Universel";
-        document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
-      }
-      updateCTU();
-      
-      let jdOrigin = toJulianDate(originDateUEC);
-      console.log(jdOrigin + " jour julien origin");
-      let jdNow = toJulianDate(new Date());
-      console.log(jdNow + " jour julien now");
-      let elapsedDays = jdNow - ORIGIN_JD;
-      console.log(elapsedDays + " jours");
-      let elapsedSeconds = elapsedDays * SPINION_DURATION;
-      console.log(elapsedSeconds + " secondes");
-    })();
-    
-    // --- Conversion en Jour Julien ---
-    function toJulianDate(date) {
-      let year = date.getUTCFullYear();
-      let month = date.getUTCMonth() + 1;
-      let day = date.getUTCDate() +
-                  date.getUTCHours()/24 +
-                  date.getUTCMinutes()/1440 +
-                  date.getUTCSeconds()/86400 +
-                  date.getUTCMilliseconds()/86400000;
-
-      let Y = year;
-      let M = month;
-      if (M <= 2) { Y -= 1; M += 12; }
-
-      let A = Math.floor(Y / 100);
-      let B = 2 - A + Math.floor(A / 4);
-    
-      return Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + day + B - 1524.5;
-    }
-
-    function updateCTU() {
-      let date = new Date();
-      let jdNow = toJulianDate(date);
-      let elapsedDays = jdNow - ORIGIN_JD;
-      let elapsedSeconds = elapsedDays * SPINION_DURATION;
-
-      // UEC Date (Orbion/Lunition/Spinion)
-      let orbion = (elapsedDays / 365.2422);
-      let spinionOfOrbion = (elapsedDays % 365.2422);
-
-      let lunition, spinion;
-      if (orbion === 0 && spinionOfOrbion === 0) {
-        // Instant 0 : 1/1/0
-        lunition = 1;
-        spinion = 1;
-      } else {
-        if (orbion > 0) {
-          // Usual Orbion : Nuiron exist
-          if (spinionOfOrbion < NUIRON_DURATION) {
-            lunition = 0;
-            spinion = spinionOfOrbion; // with spinion 0
-          } else {
-            spinionOfOrbion -= NUIRON_DURATION;
-            lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
-            spinion = spinionOfOrbion % LUNITION_DURATION;
-          }
-        } else {
-          // Orbion 0 after instant 0
-          lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
-          spinion = spinionOfOrbion % LUNITION_DURATION;
-        }
-
-        if (spinion === 0) {
-          spinion = 0;
-        } else {
-          spinion += 1; 
-        }
-      }
-      
-      spinion = Math.floor(spinion);
-      lunition = Math.floor(lunition%13);
-      orbion = Math.floor(orbion);
-
-      let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
-      let lunitionName = LUNITIONS[lunition];
-
-      // UEC Time (Spinor/Minor/Secor)
-      let secondsToSpinion = (elapsedSeconds % SPINION_DURATION);
-      let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
-      let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
-      let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
-
-      // Display update
-      document.getElementById("spinion").textContent = `${spinion}`;
-      document.getElementById("lunition").textContent = `${lunitionName}`;
-      document.getElementById("orbion").textContent = `${orbion}`;
-      document.getElementById("month").textContent = `${monthName}`;
-      document.getElementById("spinor").textContent = `${spinor.toString().padStart(2,'0')}`;
-      document.getElementById("minor").textContent = `${minor.toString().padStart(2,'0')}`;
-      document.getElementById("secor").textContent = `${secor.toString().padStart(2,'0')}`;
-      document.getElementById("hours").textContent = `${date.getHours().toString().padStart(2,'0')}`;
-      document.getElementById("minutes").textContent = `${date.getMinutes().toString().padStart(2,'0')}`;
-      document.getElementById("secondes").textContent = `${date.getSeconds().toString().padStart(2,'0')}`;
-
-      // Metadata update
-      document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${orbion}`);
-      document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${lunition}`);
-      document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
-      document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor.toString().padStart(2,'0')}`);
-      document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor.toString().padStart(2,'0')}`);
-      document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor.toString().padStart(2,'0')}`);
-
-      // ISO update
-      document.getElementById("ctu-iso").textContent = `${orbion.toString().padStart(4,'0')}-${lunition.toString().padStart(2,'0')}-${spinion.toString().padStart(2,'0')}T${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
-      
-      requestAnimationFrame(updateCTU);
-    }
-  </script>
+    <div class="date">
+        <span id="spinion">27</span>
+        <span id="lunition">Rokel</span>
+        <sup id="month">Avril</sup>
+        <span id="orbion">2739</span>
+    </div>
+    <div class="mark">* <span id="mark">after Bur-Sagale eclipse</span></div>
+    <div><p><span id="spinor">19</span>:<span id="minor">64</span>:<span id="secor">00</span> CTU</p></div>
+    <div><br /></div>
+    <div><p><span id="hours">00</span>:<span id="minutes">00</span>:<span id="secondes">00</span> Heure Locale</p></div>
+    <div id="ctu-iso" style="display:none">2739-04-27T19:64:00 CTU</div>
 </body>
 </html>
