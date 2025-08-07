@@ -80,7 +80,7 @@
     // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
     // The first precisely dated astronomical event
     const originDateUEC = new Date(Date.UTC(-763, 5, 15, 9, 0, 0)); 
-    const ORIGIN_JD = toJulianDate(originDateUEC);
+    const ORIGIN_JD = 1446328.875;
     const LUNITIONS = [
       "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
       "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
@@ -122,6 +122,8 @@
       let jdNow = toJulianDate(date);
       let elapsedDays = jdNow - ORIGIN_JD;
       let elapsedSeconds = elapsedDays * SPINION_DURATION;
+      console.log(elapsedDays + " jour julien");
+      console.log(elapsedDays + " secondes");
 
       // UEC Date (Orbion/Lunition/Spinion)
       let orbion = (elapsedDays / 365.2422);
