@@ -97,12 +97,12 @@
       updateCTU();
       
       let jdOrigin = toJulianDate(originDateUEC);
-      console.log(elapsedDays + " jour julien origin");
+      console.log(jdOrigin + " jour julien origin");
       let jdNow = toJulianDate(new Date());
-      console.log(elapsedDays + " jour julien now");
+      console.log(jdNow + " jour julien now");
       let elapsedDays = jdNow - ORIGIN_JD;
-      let elapsedSeconds = elapsedDays * SPINION_DURATION;
       console.log(elapsedDays + " jours");
+      let elapsedSeconds = elapsedDays * SPINION_DURATION;
       console.log(elapsedSeconds + " secondes");
     })();
     
