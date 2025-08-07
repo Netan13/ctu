@@ -104,10 +104,10 @@
       let M = month;
       if (M <= 2) { Y -= 1; M += 12; }
 
-      let A = Math.floor(Y/100);
-      let B = 2 - A + Math.floor(A/4);
+      let A = (Y/100);
+      let B = 2 - A + (A/4);
 
-      return Math.floor(365.25*(Y+4716)) + Math.floor(30.6001*(M+1)) + day + B - 1524.5;
+      return (365.25*(Y+4716)) + (30.6001*(M+1)) + day + B - 1524.5;
     }
 
     function updateCTU() {
@@ -117,8 +117,8 @@
       let elapsedSeconds = elapsedDays * SPINION_DURATION;
 
       // --- Calcul Orbion ---
-      let orbion = Math.floor(elapsedDays / 365.2422);
-      let spinionOfOrbion = Math.floor(elapsedDays % 365.2422);
+      let orbion = (elapsedDays / 365.2422);
+      let spinionOfOrbion = (elapsedDays % 365.2422);
 
       let lunition, spinion;
       if (orbion === 0 && spinionOfOrbion === 0) {
@@ -133,12 +133,12 @@
             spinion = spinionOfOrbion; // with spinion 0
           } else {
             spinionOfOrbion -= NUIRON_DURATION;
-            lunition = Math.floor(spinionOfOrbion / LUNITION_DURATION) + 1;
+            lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
             spinion = spinionOfOrbion % LUNITION_DURATION;
           }
         } else {
           // Orbion 0 after instant 0
-          lunition = Math.floor(spinionOfOrbion / LUNITION_DURATION) + 1;
+          lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
           spinion = spinionOfOrbion % LUNITION_DURATION;
         }
 
@@ -148,7 +148,10 @@
           spinion += 1; 
         }
       }
-      lunition %= 13;
+      
+      spinion = Math.floor(spinion);
+      lunition = Math.floor(lunition%13);
+      orbion = Math.floor(orbion);
 
       let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
       let lunitionName = LUNITIONS[lunition];
