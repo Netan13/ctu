@@ -12,7 +12,7 @@ Date.prototype.toJulian = function() {
 // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
 // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
 // The first precisely dated astronomical event
-const ORIGIN_UEC = new Date(Date.UTC(-763, 5, 15, 9, 0, 0)).toJulian(); 
+const ORIGIN_UEC = 1442902.875; 
 const LUNITIONS = [
     "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
     "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
