@@ -31,7 +31,8 @@ const SPINION_DURATION = 86400;
 })();
 
 function updateCTU() {
-  let elapsedDays = (new Date()).toJulian() - ORIGIN_UEC;
+  let now = new Date();
+  let elapsedDays = now.toJulian() - ORIGIN_UEC;
   let elapsedSeconds = elapsedDays * SPINION_DURATION;
 
   // UEC Date (Orbion/Lunition/Spinion)
@@ -88,9 +89,9 @@ function updateCTU() {
   document.getElementById("spinor").textContent = `${spinor.toString().padStart(2,'0')}`;
   document.getElementById("minor").textContent = `${minor.toString().padStart(2,'0')}`;
   document.getElementById("secor").textContent = `${secor.toString().padStart(2,'0')}`;
-  document.getElementById("hours").textContent = `${date.getHours().toString().padStart(2,'0')}`;
-  document.getElementById("minutes").textContent = `${date.getMinutes().toString().padStart(2,'0')}`;
-  document.getElementById("secondes").textContent = `${date.getSeconds().toString().padStart(2,'0')}`;
+  document.getElementById("hours").textContent = `${now.getHours().toString().padStart(2,'0')}`;
+  document.getElementById("minutes").textContent = `${now.getMinutes().toString().padStart(2,'0')}`;
+  document.getElementById("secondes").textContent = `${now.getSeconds().toString().padStart(2,'0')}`;
 
   // Metadata update
   document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${orbion}`);
