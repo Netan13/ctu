@@ -1,5 +1,14 @@
 Date.prototype.toJulian = function() {
-  return (this / 86400000) - (this.getTimezoneOffset() / 1440) + 2440587.5;
+  let msPerDay = 86400000;
+  let epochJD = 2440587.5;
+  let bceCorrection = -7.999756944365799;
+
+  let isBeforeEpoch = this < 0;
+
+  return (this / msPerDay)
+       - (this.getTimezoneOffset() / 1440)
+       + epochJD
+       + (isBeforeEpoch ? bceCorrection : 0);
 }
 
 // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
