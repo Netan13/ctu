@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <title>UEC - Universal Earth Calendar</title>
+  <link rel="apple-touch-icon" href="icon-512.ico">
+  <link rel="icon" type="image/ico" sizes="512x512" href="icon-512.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UEC - Universal Earth Calendar</title>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-title" content="CTU">
-  <link rel="apple-touch-icon" href="icon-512.ico">
-  <link rel="icon" type="image/ico" sizes="512x512" href="icon-512.ico">
+  <meta name="ctu-orbion" content="2787">
+  <meta name="ctu-lunition" content="2">
+  <meta name="ctu-spinion" content="15">
+  <meta name="ctu-spinor" content="1">
+  <meta name="ctu-minor" content="99">
+  <meta name="ctu-secor" content="00">
 
   <style>
     html {
@@ -116,7 +122,7 @@
       let elapsedDays = jdNow - ORIGIN_JD;
       let elapsedSeconds = elapsedDays * SPINION_DURATION;
 
-      // --- Calcul Orbion ---
+      // UEC Date (Orbion/Lunition/Spinion)
       let orbion = (elapsedDays / 365.2422);
       let spinionOfOrbion = (elapsedDays % 365.2422);
 
@@ -162,6 +168,7 @@
       let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
       let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
 
+      // Display update
       document.getElementById("spinion").textContent = `${spinion}`;
       document.getElementById("lunition").textContent = `${lunitionName}`;
       document.getElementById("orbion").textContent = `${orbion}`;
@@ -172,6 +179,14 @@
       document.getElementById("hours").textContent = `${date.getHours().toString().padStart(2,'0')}`;
       document.getElementById("minutes").textContent = `${date.getMinutes().toString().padStart(2,'0')}`;
       document.getElementById("secondes").textContent = `${date.getSeconds().toString().padStart(2,'0')}`;
+
+      // Metadata update
+      document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${year}`);
+      document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${month}`);
+      document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${day}`);
+      document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor}`);
+      document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor}`);
+      document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor}`);
       
       requestAnimationFrame(updateCTU);
     }
