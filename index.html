@@ -190,7 +190,7 @@
       document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor.toString().padStart(2,'0')}`);
 
       // ISO update
-      document.getElementById("ctu-iso").textContent = `${spinion}-${lunition}-${spinion}T${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
+      document.getElementById("ctu-iso").textContent = `${spinion.toString().padStart(4,'0')}-${lunition.toString().padStart(2,'0')}-${spinion.toString().padStart(2,'0')}T${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
       
       requestAnimationFrame(updateCTU);
     }
