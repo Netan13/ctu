@@ -9,11 +9,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-title" content="CTU">
-  <meta name="ctu-orbion" content="2787">
-  <meta name="ctu-lunition" content="2">
-  <meta name="ctu-spinion" content="15">
-  <meta name="ctu-spinor" content="1">
-  <meta name="ctu-minor" content="99">
+  <meta name="ctu-orbion" content="2739">
+  <meta name="ctu-lunition" content="4">
+  <meta name="ctu-spinion" content="27">
+  <meta name="ctu-spinor" content="19">
+  <meta name="ctu-minor" content="64">
   <meta name="ctu-secor" content="00">
 
   <style>
@@ -65,15 +65,15 @@
 </head>
 <body>
   <div class="date">
-    <span id="spinion"></span>
-    <span id="lunition"></span>
-    <sup id="month"></sup>
-    <span id="orbion"></span>
+    <span id="spinion">27</span>
+    <span id="lunition">Rokel</span>
+    <sup id="month">Avril</sup>
+    <span id="orbion">2739</span>
   </div>
   <div class="mark">* <span id="mark">after Bur-Sagale eclipse</span></div>
-  <div><p><span id="spinor"></span>:<span id="minor"></span>:<span id="secor"></span> CTU</p></div>
+  <div><p><span id="spinor">19</span>:<span id="minor">64</span>:<span id="secor">00</span> CTU</p></div>
   <div><br /></div>
-  <div><p><span id="hours"></span>:<span id="minutes"></span>:<span id="secondes"></span> Heure Locale</p></div>
+  <div><p><span id="hours">00</span>:<span id="minutes">00</span>:<span id="secondes">00</span> Heure Locale</p></div>
   <script>
     // UEC Origin : June 15th -763 BC 12:00pm GMT+3 ≈ 09:00am UTC
     // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
@@ -181,9 +181,9 @@
       document.getElementById("secondes").textContent = `${date.getSeconds().toString().padStart(2,'0')}`;
 
       // Metadata update
-      document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${year}`);
-      document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${month}`);
-      document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${day}`);
+      document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${orbion}`);
+      document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${lunition}`);
+      document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
       document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor}`);
       document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor}`);
       document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor}`);
