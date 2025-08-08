@@ -88,9 +88,6 @@ function updateCTU() {
   document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor.toString().padStart(2,'0')}`);
   document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor.toString().padStart(2,'0')}`);
   document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor.toString().padStart(2,'0')}`);
-
-  // ISO update
-  document.getElementById("ctu-iso").textContent = `${orbion.toString().padStart(4,'0')}-${lunition.toString().padStart(2,'0')}-${spinion.toString().padStart(2,'0')}T${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
   
   requestAnimationFrame(updateCTU);
 }
