@@ -80,7 +80,7 @@ Date.prototype.sunriseSet = function(latitude, longitude, sunrise, zenith) {
 
 Date.prototype.toJulian = function() {
   let msPerDay = 86400000;
-  let epochJD = 2440587.5;;
+  let epochJD = 2440587.5;
 
   let isBeforeEpoch = this < 0;
 
