@@ -21,7 +21,7 @@ const SPINION_DURATION = 86400;
 
 function updateSunriseCTU(position) {
     let elapsedDays = new Date().sunrise(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
-    let spinionGap = (elapsedDays % 365.2422) - ((new Date().toJulian() - ORIGIN_UEC) % 365.2422);
+    let spinionGap = Math.floor(elapsedDays % 365.2422) - Math.floor((new Date().toJulian() - ORIGIN_UEC) % 365.2422);
     let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
@@ -31,7 +31,7 @@ function updateSunriseCTU(position) {
 };
 function updateSunsetCTU(position) {
     let elapsedDays = new Date().sunset(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
-    let spinionGap = (elapsedDays % 365.2422) - ((new Date().toJulian() - ORIGIN_UEC) % 365.2422);
+    let spinionGap = Math.floor(elapsedDays % 365.2422) - Math.floor((new Date().toJulian() - ORIGIN_UEC) % 365.2422);
     let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
@@ -41,7 +41,8 @@ function updateSunsetCTU(position) {
 };
 
 function updateCTU() {
-    let elapsedDays = new Date().toJulian() - ORIGIN_UEC;
+    let now = new Date();
+    let elapsedDays = now.toJulian() - ORIGIN_UEC;
     let elapsedSeconds = elapsedDays * SPINION_DURATION;
     
     // UEC Date (Orbion/Lunition/Spinion)
