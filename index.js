@@ -16,14 +16,6 @@ const SPINION_DURATION = 86400;
         document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
     }
     updateCTU();
-    
-    console.log(ORIGIN_UEC + " jour julien origin");
-    let jdNow = (new Date()).toJulian();
-    console.log(jdNow + " jour julien now");
-    let elapsedDays = jdNow - ORIGIN_UEC;
-    console.log(elapsedDays + " jours");
-    let elapsedSeconds = elapsedDays * SPINION_DURATION;
-    console.log(elapsedSeconds + " secondes");
 })();
 
 function updateCTU() {
