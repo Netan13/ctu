@@ -4,7 +4,7 @@
         <title>UEC - Universal Earth Calendar</title>
         <link rel="apple-touch-icon" href="img/icon-512.ico" />
         <link rel="icon" type="image/ico" sizes="512x512" href="img/icon-512.ico" />
-        <link rel="stylesheet" href="css/index.css" />
+        <link href="index.css" rel="stylesheet" />
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -40,7 +40,7 @@
         <img alt="sunset" src="img/sunset.png" />
         <span id="local-sunset"></span>
     </div>
-    <script type="text/javascript" src="js/date.js"></script>
-    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="date.js"></script>
+    <script type="text/javascript" src="index.js"></script>
 </body>
 </html>
