@@ -27,7 +27,7 @@ function updateSunriseCTU(position) {
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
     document.getElementById("local-sunrise").textContent = `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}` 
-        + (secondsToSpinion > 0 ? ` +${secondsToSpinion}J ` : secondsToSpinion < 0 ? ` -${secondsToSpinion}J ` : ``) + `CTU`;
+        + (secondsToSpinion > 0 ? ` +1J ` : secondsToSpinion < 0 ? ` -1J ` : ``) + `CTU`;
 };
 function updateSunsetCTU(position) {
     let elapsedDays = new Date().sunset(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
@@ -37,7 +37,7 @@ function updateSunsetCTU(position) {
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
     document.getElementById("local-sunset").textContent =  `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}` 
-        + (secondsToSpinion > 0 ? ` +${secondsToSpinion}J ` : secondsToSpinion < 0 ? ` -${secondsToSpinion}J ` : ``) + `CTU`;
+        + (spinionGap > 0 ? ` +1J ` : spinionGap < 0 ? ` -1J ` : ``) + `CTU`;
 };
 
 function updateCTU() {
