@@ -25,10 +25,6 @@ sup {
     font-weight: 100;
     font-style: italic;
 }
-img {
-    height: 64px;
-    width: 64px;
-}
 .date {
     flex-wrap: wrap;
     font-size: 30pt;
@@ -40,9 +36,16 @@ img {
     font-size: 8pt;
     font-style: italic;
 }
+.sun {
+	margin : 20px 0 0;
+}
+.sun img {
+    height: 25px;
+    width: 25px;
+}
 @media (prefers-color-scheme: dark) {
     html { background: #121212; color: #e0e0e0; }
-	img { filter: invert(1); }
+	.sun img { filter: invert(1); }
 }
 @media (prefers-color-scheme: light) {
     html { background: #ffffff; color: #222222; }
