@@ -10,28 +10,35 @@ const NUIRON_DURATION = 11;
 const LUNITION_DURATION = 29;
 const SPINION_DURATION = 86400;
 
-navigator.geolocation.getSunriseCTU = function(position) {
-    let secondsToSpinion = (new Date().sunrise(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC) * SPINION_DURATION % SPINION_DURATION;
-    let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
-    let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
-    let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
-    return `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
-};
-navigator.geolocation.getSunsetCTU = function(position) {
-    let secondsToSpinion = (new Date().sunset(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC) * SPINION_DURATION % SPINION_DURATION;
-    let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
-    let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
-    let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
-    return `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
-};
-
 (function() {
     if (navigator.language === 'fr-FR') {
         document.title = "CTU - Calendrier Terrestre Universel";
         document.getElementById("mark").textContent = "après l'éclispe de Bûr-Sagalé";
+        document.getElementById("sun-label").textContent = "Lever et Coucher de Soleil";
     }
     updateCTU();
 })();
+
+function updateSunriseCTU(position) {
+    let elapsedDays = new Date().sunrise(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
+    let spinionGap = (elapsedDays % 365.2422) - ((now.toJulian() - ORIGIN_UEC) % 365.2422);
+    let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
+    let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
+    let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
+    let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
+    document.getElementById("local-sunrise").textContent = `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}` 
+        + (secondsToSpinion > 0 ? ` +${secondsToSpinion}J ` : secondsToSpinion < 0 ? ` -${secondsToSpinion}J ` : ``) + `CTU`;
+};
+function updateSunsetCTU(position) {
+    let elapsedDays = new Date().sunset(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
+    let spinionGap = (elapsedDays % 365.2422) - ((now.toJulian() - ORIGIN_UEC) % 365.2422);
+    let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
+    let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
+    let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
+    let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
+    document.getElementById("local-sunset").textContent =  `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}` 
+        + (secondsToSpinion > 0 ? ` +${secondsToSpinion}J ` : secondsToSpinion < 0 ? ` -${secondsToSpinion}J ` : ``) + `CTU`;
+};
 
 function updateCTU() {
     let now = new Date();
@@ -85,10 +92,8 @@ function updateCTU() {
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
 
     // Get Sunrise & Sunset
-    navigator.geolocation.getCurrentPosition(function(position) {
-        document.getElementById("local-sunrise").textContent = navigator.geolocation.getSunriseCTU(position);
-        document.getElementById("local-sunset").textContent = navigator.geolocation.getSunsetCTU(position);
-    });
+    navigator.geolocation.getCurrentPosition(updateSunriseCTU);
+    navigator.geolocation.getCurrentPosition(updateSunsetCTU);
     
     // Display update
     document.getElementById("spinion").textContent = `${spinion}`;
