@@ -85,6 +85,10 @@ function updateCTU() {
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
 
     // Get Sunrise & Sunset
+    navigator.geolocation.getCurrentPosition(function(position) {
+        document.getElementById("local-sunrise").textContent = navigator.geolocation.getSunriseCTU(position);
+        document.getElementById("local-sunset").textContent = navigator.geolocation.getSunsetCTU(position);
+    });
     
     // Display update
     document.getElementById("spinion").textContent = `${spinion}`;
@@ -97,9 +101,6 @@ function updateCTU() {
     document.getElementById("hours").textContent = `${now.getHours().toString().padStart(2,'0')}`;
     document.getElementById("minutes").textContent = `${now.getMinutes().toString().padStart(2,'0')}`;
     document.getElementById("secondes").textContent = `${now.getSeconds().toString().padStart(2,'0')}`;
-    
-    document.getElementById("local-sunrise").textContent = navigator.geolocation.getSunriseCTU();
-    document.getElementById("local-sunset").textContent = navigator.geolocation.getSunsetCTU();
     
     // Metadata update
     document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${orbion}`);
