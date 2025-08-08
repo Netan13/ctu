@@ -10,20 +10,20 @@ const NUIRON_DURATION = 11;
 const LUNITION_DURATION = 29;
 const SPINION_DURATION = 86400;
 
-navigator.geolocation.getSunriseCTU(function(position) {
+navigator.geolocation.getSunriseCTU = function(position) {
     let secondsToSpinion = (new Date().sunrise(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC) * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
     return `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
-});
-navigator.geolocation.getSunsetCTU(function(position) {
+};
+navigator.geolocation.getSunsetCTU = function(position) {
     let secondsToSpinion = (new Date().sunset(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC) * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
     return `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')} CTU`;
-});
+};
 
 (function() {
     if (navigator.language === 'fr-FR') {
