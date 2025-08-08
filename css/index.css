@@ -37,7 +37,8 @@ sup {
     font-style: italic;
 }
 .sun {
-	margin : 20px 0 0;
+	margin : 20px 0;
+	align-items: center;
 }
 .sun img {
     height: 25px;
