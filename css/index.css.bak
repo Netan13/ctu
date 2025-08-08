@@ -42,6 +42,7 @@ img {
 }
 @media (prefers-color-scheme: dark) {
     html { background: #121212; color: #e0e0e0; }
+	img { filter: invert(1); }
 }
 @media (prefers-color-scheme: light) {
     html { background: #ffffff; color: #222222; }
