@@ -90,15 +90,14 @@ function updateCTU() {
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
-
-    // Get Sunrise & Sunset
-    navigator.geolocation.getCurrentPosition(updateSunriseCTU);
-    navigator.geolocation.getCurrentPosition(updateSunsetCTU);
     
     // Display update
     if (document.getElementById("spinion").textContent !== `${spinion}`) {
         document.getElementById("spinion").textContent = `${spinion}`;
         document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
+        // Get Sunrise & Sunset
+        navigator.geolocation.getCurrentPosition(updateSunriseCTU);
+        navigator.geolocation.getCurrentPosition(updateSunsetCTU);
     }
     if (document.getElementById("lunition").textContent !== `${lunitionName}`) {
         document.getElementById("lunition").textContent = `${lunitionName}`;
