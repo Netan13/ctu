@@ -69,7 +69,7 @@ function updateSunriseCTU(position) {
     let sunrise = `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}` + (spinionGap > 0 ? ` +1J` : spinionGap < 0 ? ` -1J` : ``) + ` CTU`
     if (document.getElementById("local-sunrise").textContent !== sunrise) {
         document.getElementById("local-sunrise").textContent = sunrise;
-        document.querySelector('meta[name="ctu-local-sunrise"]')?.setAttribute("content", `${minor.toString().padStart(2,'0')}`);
+        document.querySelector('meta[name="ctu-local-sunrise"]')?.setAttribute("content", `${sunrise}`);
     }
 };
 
@@ -83,6 +83,7 @@ function updateSunsetCTU(position) {
     let sunset = `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}` + (spinionGap > 0 ? ` +1J` : spinionGap < 0 ? ` -1J` : ``) + ` CTU`;
     if (document.getElementById("local-sunset").textContent !== sunset) {
         document.getElementById("local-sunset").textContent = sunset;
+        document.querySelector('meta[name="ctu-local-sunrise"]')?.setAttribute("content", `${sunset}`);
     }
 };
 
