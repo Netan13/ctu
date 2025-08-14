@@ -86,7 +86,10 @@ function updateSunsetCTU(position) {
     }
 };
 
-function updateDisplay(now, spinion, lunitionName, monthName, orbion, spinor, minor, secor) {
+function updateDisplay(now, spinion, lunition, orbion, spinor, minor, secor) {
+    let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
+    let lunitionName = LUNITIONS[lunition];
+    
     if (document.getElementById("spinion").textContent !== `${spinion}`) {
         document.getElementById("spinion").textContent = `${spinion}`;
         document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
@@ -135,8 +138,6 @@ function updateCTU() {
     
     // UEC Date (Orbion/Lunition/Spinion)
     let {lunition, spinion, orbion} = elapsedDaysToSpinionLunitionOrbion(elapsedDays);
-    let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
-    let lunitionName = LUNITIONS[lunition];
     
     // UEC Time (Spinor/Minor/Secor)
     let secondsToSpinion = (elapsedSeconds % SPINION_DURATION);
@@ -145,7 +146,7 @@ function updateCTU() {
     let secor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 200000) % 100);
     
     // Display update
-    updateDisplay(now, spinion, lunitionName, monthName, orbion, spinor, minor, secor);
+    updateDisplay(now, spinion, lunition, orbion, spinor, minor, secor);
     navigator.geolocation.getCurrentPosition(updateSunriseCTU);
     navigator.geolocation.getCurrentPosition(updateSunsetCTU);
     
