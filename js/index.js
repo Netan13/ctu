@@ -96,24 +96,45 @@ function updateCTU() {
     navigator.geolocation.getCurrentPosition(updateSunsetCTU);
     
     // Display update
-    document.getElementById("spinion").textContent = `${spinion}`;
-    document.getElementById("lunition").textContent = `${lunitionName}`;
-    document.getElementById("orbion").textContent = `${orbion}`;
-    document.getElementById("month").textContent = `${monthName}`;
-    document.getElementById("spinor").textContent = `${spinor.toString().padStart(2,'0')}`;
-    document.getElementById("minor").textContent = `${minor.toString().padStart(2,'0')}`;
-    document.getElementById("secor").textContent = `${secor.toString().padStart(2,'0')}`;
-    document.getElementById("hours").textContent = `${now.getHours().toString().padStart(2,'0')}`;
-    document.getElementById("minutes").textContent = `${now.getMinutes().toString().padStart(2,'0')}`;
-    document.getElementById("secondes").textContent = `${now.getSeconds().toString().padStart(2,'0')}`;
+    if (document.getElementById("spinion").textContent !== `${spinion}`) {
+        document.getElementById("spinion").textContent = `${spinion}`;
+        document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
+    }
+    if (document.getElementById("lunition").textContent !== `${lunitionName}`) {
+        document.getElementById("lunition").textContent = `${lunitionName}`;
+        document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${lunition}`);
+    }
+    if (document.getElementById("month").textContent !== `${monthName}`) {
+        document.getElementById("month").textContent = `${monthName}`;
+    }
+    if (document.getElementById("orbion").textContent !== `${orbion}`) {
+        document.getElementById("orbion").textContent = `${orbion}`;
+        document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${orbion}`);
+    }
+    if (document.getElementById("spinion").textContent !== `${spinion}`) {
+        document.getElementById("spinion").textContent = `${spinion}`;
+    }
+    if (document.getElementById("spinor").textContent !== `${spinor.toString().padStart(2,'0')}`) {
+        document.getElementById("spinor").textContent = `${spinor.toString().padStart(2,'0')}`;
+        document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor.toString().padStart(2,'0')}`);
+    }
+    if (document.getElementById("minor").textContent !== `${minor.toString().padStart(2,'0')}`) {
+        document.getElementById("minor").textContent = `${minor.toString().padStart(2,'0')}`;
+        document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor.toString().padStart(2,'0')}`);
+    }
+    if (document.getElementById("secor").textContent !== `${secor.toString().padStart(2,'0')}`) {
+        document.getElementById("secor").textContent = `${secor.toString().padStart(2,'0')}`;
+        document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor.toString().padStart(2,'0')}`);
+    }
+    if (document.getElementById("hours").textContent !== `${now.getHours().toString().padStart(2,'0')}`) {
+        document.getElementById("hours").textContent = `${now.getHours().toString().padStart(2,'0')}`;
+    }
+    if (document.getElementById("minutes").textContent !== `${now.getMinutes().toString().padStart(2,'0')}`) {
+        document.getElementById("minutes").textContent = `${now.getMinutes().toString().padStart(2,'0')}`;
+    }
+    if (document.getElementById("secondes").textContent !== `${now.getSeconds().toString().padStart(2,'0')}`) {
+        document.getElementById("secondes").textContent = `${now.getSeconds().toString().padStart(2,'0')}`;
+    }
     
-    // Metadata update
-    document.querySelector('meta[name="ctu-orbion"]')?.setAttribute("content", `${orbion}`);
-    document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${lunition}`);
-    document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
-    document.querySelector('meta[name="ctu-spinor"]')?.setAttribute("content", `${spinor.toString().padStart(2,'0')}`);
-    document.querySelector('meta[name="ctu-minor"]')?.setAttribute("content", `${minor.toString().padStart(2,'0')}`);
-    document.querySelector('meta[name="ctu-secor"]')?.setAttribute("content", `${secor.toString().padStart(2,'0')}`);
-  
     requestAnimationFrame(updateCTU);
 }
