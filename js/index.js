@@ -83,7 +83,7 @@ function updateSunsetCTU(position) {
     let sunset = `${spinor.toString().padStart(2,'0')}:${minor.toString().padStart(2,'0')}:${secor.toString().padStart(2,'0')}` + (spinionGap > 0 ? ` +1J` : spinionGap < 0 ? ` -1J` : ``) + ` CTU`;
     if (document.getElementById("local-sunset").textContent !== sunset) {
         document.getElementById("local-sunset").textContent = sunset;
-        document.querySelector('meta[name="ctu-local-sunrise"]')?.setAttribute("content", `${sunset}`);
+        document.querySelector('meta[name="ctu-local-sunset"]')?.setAttribute("content", `${sunset}`);
     }
 };
 
