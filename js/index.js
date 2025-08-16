@@ -88,19 +88,13 @@ function updateSunsetCTU(position) {
 };
 
 function updateDisplay(now, spinion, lunition, orbion, spinor, minor, secor) {
-    let monthName = lunition === 0 ? "" : "(" + (new Date(2000, lunition-1, 1)).toLocaleDateString(navigator.language, { month: 'long' }) + ")";
-    let lunitionName = LUNITIONS[lunition];
-    
     if (document.getElementById("spinion").textContent !== `${spinion}`) {
         document.getElementById("spinion").textContent = `${spinion}`;
         document.querySelector('meta[name="ctu-spinion"]')?.setAttribute("content", `${spinion}`);
     }
-    if (document.getElementById("lunition").textContent !== `${lunitionName}`) {
-        document.getElementById("lunition").textContent = `${lunitionName}`;
+    if (document.getElementById("lunition").textContent !== `${LUNITIONS[lunition]}`) {
+        document.getElementById("lunition").textContent = `${LUNITIONS[lunition]}`;
         document.querySelector('meta[name="ctu-lunition"]')?.setAttribute("content", `${lunition}`);
-    }
-    if (document.getElementById("month").textContent !== `${monthName}`) {
-        document.getElementById("month").textContent = `${monthName}`;
     }
     if (document.getElementById("orbion").textContent !== `${orbion}`) {
         document.getElementById("orbion").textContent = `${orbion}`;
