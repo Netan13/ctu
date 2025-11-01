@@ -61,8 +61,7 @@ function elapsedDaysToSpinionLunitionOrbion(elapsedDays) {
 
 function updateSunriseCTU(position) {
     let elapsedDays = new Date().sunrise(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
-    let spinionGap = Math.floor(elapsedDays % 365.2422) - Math.floor((new Date().toJulian() - ORIGIN_UEC) % 365.2422);
-    console.log(spinionGap, new Date().sunrise(position.coords.latitude, position.coords.longitude), elapsedDays, (new Date().toJulian() - ORIGIN_UEC), Math.floor(elapsedDays % 365.2422),  Math.floor((new Date().toJulian() - ORIGIN_UEC) % 365.2422));
+    let spinionGap = Math.floor(elapsedDays) - Math.floor(new Date().toJulian() - ORIGIN_UEC);
     let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
@@ -76,7 +75,7 @@ function updateSunriseCTU(position) {
 
 function updateSunsetCTU(position) {
     let elapsedDays = new Date().sunset(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
-    let spinionGap = Math.floor(elapsedDays % 365.2422) - Math.floor((new Date().toJulian() - ORIGIN_UEC) % 365.2422);
+    let spinionGap = Math.floor(elapsedDays) - Math.floor(new Date().toJulian() - ORIGIN_UEC);
     let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
