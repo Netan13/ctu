@@ -103,9 +103,8 @@
         const minorInt = Math.floor(s.minorFloat);
         const secorTotal = s.secorFloat; // e.g. 12.345...
         const secorInt = Math.floor(secorTotal);
-        const secorFrac = Math.floor((secorTotal - secorInt) * 100); // two decimals
 
-        elTime.textContent = `${pad2(s.spinor)}:${pad2(minorInt)}:${pad2(secorInt)}.${String(secorFrac).padStart(2,'0')} CTU`;
+        elTime.textContent = `${pad2(s.spinor)}:${pad2(minorInt)}:${pad2(secorInt)} CTU`;
     }
 
     // animation loop
