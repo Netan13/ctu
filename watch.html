@@ -5,20 +5,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>CTU — Watch</title>
 <style>
-  html,body{height:100%;margin:0;background:#050505;color:#fff;font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial;}
+  html,body{height:100%;margin:0;background:#050505;color:#fff;font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial;}
   .wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:10px;box-sizing:border-box;text-align:center;}
   .date{font-size:18px;font-weight:600;margin-bottom:6px;}
-  .time{font-family:monospace;font-size:30px;font-weight:700;}
+  .time{font-family:monospace;font-size:30px;font-weight:700;letter-spacing:0.02em;}
   .btns{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:8px;}
   button{background:rgba(255,255,255,0.08);border:0;padding:8px;border-radius:10px;color:#fff;font-size:14px;}
-  small{opacity:0.6}
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="date" id="ctu-date">— — —</div>
     <div class="time" id="ctu-time">--:--:-- CTU</div>
-    <div style="margin-top:8px"><small id="mark">CTU</small></div>
   </div>
 
   <div class="btns">
@@ -71,38 +69,69 @@ function computeCTU(date){
   const {spinion, lunition, orbion} = elapsedDaysToSpinionLunitionOrbion(elapsedDays);
   const secondsToSpinion = mod(elapsedSeconds, SPINION_DURATION);
   const fraction = secondsToSpinion / SPINION_DURATION;
+
+  // continuous values
   const spinor = Math.floor(fraction * 20);
-  const minor = Math.floor((fraction * 2000) % 100);
-  const secor = Math.floor((fraction * 200000) % 100);
-  return { spinion, lunition, orbion, spinor, minor, secor, secondsIntoSpinion: secondsToSpinion };
+  // minor and secor as continuous numbers (we keep fractional part for fluidity)
+  const minorFloat = (fraction * 2000) % 100;      // 0..99.xx
+  const secorFloat = (fraction * 200000) % 100;    // 0..99.xx
+
+  return {
+    spinion, lunition, orbion,
+    spinor,
+    minorFloat,
+    secorFloat,
+    secondsIntoSpinion: secondsToSpinion
+  };
 }
 
-// ---- UI update ----
+// ---- UI update with requestAnimationFrame ----
 const elDate = document.getElementById('ctu-date');
 const elTime = document.getElementById('ctu-time');
-let tickHandle = null;
+let rafId = null;
+let running = false;
 
+function pad2(n){ return String(Math.floor(n)).padStart(2,'0'); }
+
+// Render one frame (uses continuous floats for fluidity)
 function renderOnce(){
   const now = new Date();
   const s = computeCTU(now);
   elDate.textContent = `${s.spinion} ${LUNITIONS[s.lunition]} ${s.orbion}`;
-  elTime.textContent = `${String(s.spinor).padStart(2,'0')}:${String(s.minor).padStart(2,'0')}:${String(s.secor).padStart(2,'0')} CTU`;
+
+  // minor: integer, secor: integer + 2 decimals for smoothness
+  const minorInt = Math.floor(s.minorFloat);
+  const secorTotal = s.secorFloat; // e.g. 12.345...
+  const secorInt = Math.floor(secorTotal);
+  const secorFrac = Math.floor((secorTotal - secorInt) * 100); // two decimals
+
+  elTime.textContent = `${pad2(s.spinor)}:${pad2(minorInt)}:${pad2(secorInt)}.${String(secorFrac).padStart(2,'0')} CTU`;
 }
 
-// start/stop 1s updates based on visibility
-function startTick(){
-  if (tickHandle) return;
-  renderOnce(); // immediate
-  tickHandle = setInterval(renderOnce, 1000);
+// animation loop
+function loop() {
+  renderOnce();
+  rafId = requestAnimationFrame(loop);
 }
+
+function startTick(){
+  if (running) return;
+  running = true;
+  // one immediate render
+  renderOnce();
+  rafId = requestAnimationFrame(loop);
+}
+
 function stopTick(){
-  if (!tickHandle) return;
-  clearInterval(tickHandle);
-  tickHandle = null;
-  // one last render for snapshot
+  if (!running) return;
+  cancelAnimationFrame(rafId);
+  rafId = null;
+  running = false;
+  // final static render for snapshot
   renderOnce();
 }
 
+// start/stop on visibility
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') startTick();
   else stopTick();
@@ -110,29 +139,7 @@ document.addEventListener('visibilitychange', () => {
 
 // initial behavior
 if (document.visibilityState === 'visible') startTick();
+else renderOnce();
 
-// ---- optional: accept coords via ?lat=..&lon=.. ----
-function getParams(){
-  const p = {};
-  try {
-    const s = location.search.substring(1).split('&');
-    s.forEach(kv=>{
-      if(!kv) return;
-      const [k,v] = kv.split('=');
-      p[decodeURIComponent(k)] = decodeURIComponent(v || '');
-    });
-  } catch(e){}
-  return p;
-}
-
-const params = getParams();
-// If lat/lon given, you could compute sunrise/sunset client-side. For now we ignore if absent.
-// If you want sunrise/sunset, either compute here or pass coords when opening the page.
-
-document.getElementById('btn1').addEventListener('click', ()=>{ window.location.href = 'https://netan13.github.io/ctu/'; });
-// Example: run a shortcut named "CTU Action" (may require URL-encoding)
-document.getElementById('btn2').addEventListener('click', ()=>{ window.location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent('CTU Action'); });
-
-</script>
-</body>
-</html>
+// buttons
+document.getElemen
