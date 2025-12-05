@@ -1,7 +1,7 @@
 // UEC Origin : June 15th -763 BC 12:00am GMT+3
 // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
 // The first precisely dated astronomical event
-const ORIGIN_UEC = 1486102.5; 
+const ORIGIN_UEC = 1486102.5;
 const LUNITIONS = [
     "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
     "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
@@ -61,7 +61,7 @@ function elapsedDaysToSpinionLunitionOrbion(elapsedDays) {
 
 function updateSunriseCTU(position) {
     let elapsedDays = new Date().sunrise(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
-    let spinionGap = Math.floor(elapsedDays % 365.2422) - Math.floor(Math.mod(new Date().toJulian() - ORIGIN_UEC, 365.2422));
+    let spinionGap = Math.floor(elapsedDays) - Math.floor(new Date().toJulian() - ORIGIN_UEC);
     let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
@@ -75,7 +75,7 @@ function updateSunriseCTU(position) {
 
 function updateSunsetCTU(position) {
     let elapsedDays = new Date().sunset(position.coords.latitude, position.coords.longitude).toJulian() - ORIGIN_UEC;
-    let spinionGap = Math.floor(elapsedDays % 365.2422) - Math.floor(Math.mod(new Date().toJulian() - ORIGIN_UEC, 365.2422));
+    let spinionGap = Math.floor(elapsedDays) - Math.floor(new Date().toJulian() - ORIGIN_UEC);
     let secondsToSpinion = elapsedDays * SPINION_DURATION % SPINION_DURATION;
     let spinor = Math.floor((secondsToSpinion / SPINION_DURATION) * 20);
     let minor = Math.floor(((secondsToSpinion / SPINION_DURATION) * 2000) % 100);
