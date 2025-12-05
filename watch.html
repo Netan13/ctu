@@ -5,12 +5,71 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>CTU — Watch</title>
     <style>
-        html,body{height:100%;margin:0;background:#050505;color:#fff;font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial;}
-        .wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:10px;box-sizing:border-box;text-align:center;}
-        .date{font-size:18px;font-weight:600;margin-bottom:6px;}
-        .time{font-family:monospace;font-size:30px;font-weight:700;letter-spacing:0.02em;}
-        .btns{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:8px;}
-        button{background:rgba(255,255,255,0.08);border:0;padding:8px;border-radius:10px;color:#fff;font-size:14px;}
+        /* reprend la font-family et les tailles du site */
+        html {
+            font-family: 'Courier New', sans-serif, monospace;
+            transition: background 0.3s, color 0.3s;
+            height: 100%;
+        }
+        body {
+            height: 100%;
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            margin: auto;
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        .wrap {
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            height:100%;
+            padding:10px;
+            box-sizing:border-box;
+            text-align:center;
+        }
+
+        /* date = spinion + lunition + orbion, même taille que le site */
+        .date {
+            flex-wrap: wrap;
+            font-size: 30pt;     /* identique au site */
+            font-weight: 600;
+            text-transform: capitalize;
+            margin-bottom: 6px;
+        }
+
+        /* time reprend la taille des <p> du site (monospace, 20pt) */
+        .time {
+            font-family: monospace;
+            font-size: 20pt;     /* identique au site */
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        .btns {
+            position:absolute;
+            right:8px;
+            top:8px;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+        }
+        button {
+            background: rgba(255,255,255,0.08);
+            border: 0;
+            padding: 8px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        @media (prefers-color-scheme: light) {
+            body { background: #ffffff; color: #222222; }
+            button { color: #000; background: rgba(0,0,0,0.06); }
+        }
     </style>
 </head>
 <body>
@@ -25,7 +84,7 @@
 </div>
 
 <script>
-    // ---- CTU logic (portage minimal du repo) ----
+    // ---- CTU logic (fidèle au repo) ----
     const ORIGIN_UEC = 1486102.5;
     const LUNITIONS = ["Nuiron","Kelva","Drenae","Vellune","Rokel","Cereon","Elvora","Zailun","Aruel","Thylis","Velunor","Ombran","Siliane"];
     const NUIRON_DURATION = 11;
@@ -70,45 +129,35 @@
         const secondsToSpinion = mod(elapsedSeconds, SPINION_DURATION);
         const fraction = secondsToSpinion / SPINION_DURATION;
 
-        // continuous values
         const spinor = Math.floor(fraction * 20);
-        // minor and secor as continuous numbers (we keep fractional part for fluidity)
-        const minorFloat = (fraction * 2000) % 100;      // 0..99.xx
-        const secorFloat = (fraction * 200000) % 100;    // 0..99.xx
+        const minorInt = Math.floor((fraction * 2000) % 100);
+        const secorInt = Math.floor((fraction * 200000) % 100);
 
         return {
             spinion, lunition, orbion,
             spinor,
-            minorFloat,
-            secorFloat,
+            minor: minorInt,
+            secor: secorInt,
             secondsIntoSpinion: secondsToSpinion
         };
     }
 
-    // ---- UI update with requestAnimationFrame ----
+    // ---- UI update with requestAnimationFrame (fluid while visible) ----
     const elDate = document.getElementById('ctu-date');
     const elTime = document.getElementById('ctu-time');
     let rafId = null;
     let running = false;
 
-    function pad2(n){ return String(Math.floor(n)).padStart(2,'0'); }
+    function pad2(n){ return String(n).padStart(2,'0'); }
 
-    // Render one frame (uses continuous floats for fluidity)
     function renderOnce(){
         const now = new Date();
         const s = computeCTU(now);
         elDate.textContent = `${s.spinion} ${LUNITIONS[s.lunition]} ${s.orbion}`;
-
-        // minor: integer, secor: integer + 2 decimals for smoothness
-        const minorInt = Math.floor(s.minorFloat);
-        const secorTotal = s.secorFloat; // e.g. 12.345...
-        const secorInt = Math.floor(secorTotal);
-
-        elTime.textContent = `${pad2(s.spinor)}:${pad2(minorInt)}:${pad2(secorInt)} CTU`;
+        elTime.textContent = `${pad2(s.spinor)}:${pad2(s.minor)}:${pad2(s.secor)} CTU`;
     }
 
-    // animation loop
-    function loop() {
+    function loop(){
         renderOnce();
         rafId = requestAnimationFrame(loop);
     }
@@ -116,7 +165,6 @@
     function startTick(){
         if (running) return;
         running = true;
-        // one immediate render
         renderOnce();
         rafId = requestAnimationFrame(loop);
     }
@@ -126,23 +174,20 @@
         cancelAnimationFrame(rafId);
         rafId = null;
         running = false;
-        // final static render for snapshot
         renderOnce();
     }
 
-    // start/stop on visibility
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') startTick();
         else stopTick();
     });
 
-    // initial behavior
+    // initial
     if (document.visibilityState === 'visible') startTick();
     else renderOnce();
 
     // buttons
     document.getElementById('btn1').addEventListener('click', ()=>{ window.location.href = 'https://netan13.github.io/ctu/'; });
-    // example: run a shortcut named "CTU Action"
     document.getElementById('btn2').addEventListener('click', ()=>{ window.location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent('CTU Action'); });
 
 </script>
