@@ -6,14 +6,14 @@
   function pad2(n) { return String(n).padStart(2, '0'); }
 
   function render(now) {
-    if (!Date.CTU || typeof Date.CTU.compute !== 'function') {
+    if (!CTU || typeof date_compute !== 'function') {
       elDate.textContent = 'CTU non dispo';
       elTime.textContent = '—';
       elMeta.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
       return;
     }
 
-    const c = Date.CTU.compute(now);
+    const c = date_compute(now);
 
     elDate.textContent = `${c.spinion} ${c.lunitionName} ${c.orbion}`;
     elTime.textContent = `${pad2(c.spinor)}:${pad2(c.minor)}:${pad2(c.secor)} CTU`;

@@ -1,3 +1,15 @@
+// UEC Origin : June 15th -763 BC 12:00am GMT+3
+// The Assyrian eclipse, also known as the Bur-Sagale eclipse.
+// The first precisely dated astronomical event
+const ORIGIN_UEC = 1486102.5;
+const LUNITIONS = [
+    "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
+    "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
+];
+const NUIRON_DURATION = 11;
+const LUNITION_DURATION = 29;
+const SPINION_DURATION = 86400;
+
 Date.prototype.sunrise = function(latitude, longitude, zenith) {
 	return this.sunriseSet(latitude, longitude, true, zenith);
 }
@@ -89,20 +101,7 @@ Date.prototype.toJulian = function() {
        + epochJD;
 }
 
-Date.CTU = Object.freeze({
-  // UEC Origin : June 15th -763 BC 12:00am GMT+3 (cf index.js)
-  ORIGIN_UEC: 1486102.5,
-  LUNITIONS: Object.freeze([
-    "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
-    "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
-  ]),
-  NUIRON_DURATION: 11,
-  LUNITION_DURATION: 29,
-  SPINION_DURATION: 86400,
-  ORBION_DURATION: 365.2422
-});
-
-Date.CTU.elapsedDaysToSpinionLunitionOrbion = function (elapsedDays) {
+function date_elapsedDaysToSpinionLunitionOrbion(elapsedDays) {
   const { ORBION_DURATION, NUIRON_DURATION, LUNITION_DURATION } = Date.CTU;
 
   let orbion = (elapsedDays / ORBION_DURATION);
@@ -141,7 +140,7 @@ Date.CTU.elapsedDaysToSpinionLunitionOrbion = function (elapsedDays) {
   return { spinion, lunition, orbion };
 };
 
-Date.CTU.compute = function (date) {
+function date_compute(date) {
   const d = (date instanceof Date) ? date : new Date(date);
   if (Number.isNaN(d.getTime())) throw new Error("Invalid date for CTU.compute");
 
@@ -152,7 +151,7 @@ Date.CTU.compute = function (date) {
   const elapsedSeconds = elapsedDays * SPINION_DURATION;
 
   const { spinion, lunition, orbion } =
-    Date.CTU.elapsedDaysToSpinionLunitionOrbion(elapsedDays);
+    date_elapsedDaysToSpinionLunitionOrbion(elapsedDays);
 
   const secondsToSpinion = Math.mod(elapsedSeconds, SPINION_DURATION);
   const fraction = secondsToSpinion / SPINION_DURATION;
@@ -176,7 +175,7 @@ Date.CTU.compute = function (date) {
 };
 
 Date.prototype.toCTU = function () {
-  return Date.CTU.compute(this);
+  return date_compute(this);
 };
 
 Date.DEGREES_PER_HOUR = 360 / 24;
