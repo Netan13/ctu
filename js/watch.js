@@ -5,7 +5,7 @@
   function pad2(n) { return String(n).padStart(2, '0'); }
 
   function render(now) {
-    if (!CTU || typeof date_compute !== 'function') {
+    if (typeof date_compute !== 'function') {
       elDate.textContent = 'CTU non dispo';
       elTime.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
       return;
