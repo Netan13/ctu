@@ -1,28 +1,22 @@
 (function () {
-	const elDt = document.getElementById('dt');
-	const elOutDate = document.getElementById('out-date');
-	const elOutTime = document.getElementById('out-time');
-	const btnNow = document.getElementById('btn-now');
-	const btnConvert = document.getElementById('btn-convert');
-
 	if (navigator.language === 'fr-FR') {
 		document.title = "CTU - Convertisseur";
         document.querySelector('meta[name="description"]')?.setAttribute("content", "Calendrier Terrestre Universel - Convertisseur de date");
 	}
 
-	btnNow.addEventListener('click', () => {
+	document.getElementById('btn-now').addEventListener('click', () => {
 		const now = new Date();
-		elDt.value = toDatetimeLocalValue(now);
+		document.getElementById('dt').value = toDatetimeLocalValue(now);
 		render(now);
 	});
 
-	btnConvert.addEventListener('click', () => {
+	document.getElementById('btn-convert').addEventListener('click', () => {
 		// Interprété en local, ce qu’on veut avec datetime-local
-		render(new Date(elDt.value));
+		render(new Date(document.getElementById('dt').value));
 	});
 
 	// init
-	btnNow.click();
+	document.getElementById('btn-now').click();
 })();
 
 function pad2(n) {
@@ -38,18 +32,18 @@ function toDatetimeLocalValue(d) {
 
 function render(date) {
 	if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
-		elOutDate.textContent = 'Date invalide';
-		elOutTime.textContent = '—';
+		document.getElementById('out-date').textContent = 'Date invalide';
+		document.getElementById('out-time').textContent = '—';
 		return;
 	}
 
 	if (typeof date.toCTU !== 'function') {
-		elOutDate.textContent = 'CTU non dispo';
-		elOutTime.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
+		document.getElementById('out-date').textContent = 'CTU non dispo';
+		document.getElementById('out-time').textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
 		return;
 	}
 
 	const c = date.toCTU();
-	elOutDate.textContent = `${c.spinion} ${c.lunitionName} ${c.orbion}`;
-	elOutTime.textContent = `${pad2(c.spinor)}:${pad2(c.minor)}:${pad2(c.secor)} CTU`;
+	document.getElementById('out-date').textContent = `${c.spinion} ${c.lunitionName} ${c.orbion}`;
+	document.getElementById('out-time').textContent = `${pad2(c.spinor)}:${pad2(c.minor)}:${pad2(c.secor)} CTU`;
 }
