@@ -1,15 +1,13 @@
 (function () {
   const elDate = document.getElementById('ctu-date');
   const elTime = document.getElementById('ctu-time');
-  const elMeta = document.getElementById('ctu-meta');
 
   function pad2(n) { return String(n).padStart(2, '0'); }
 
   function render(now) {
     if (!CTU || typeof date_compute !== 'function') {
       elDate.textContent = 'CTU non dispo';
-      elTime.textContent = '—';
-      elMeta.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
+      elTime.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
       return;
     }
 
