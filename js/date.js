@@ -102,8 +102,6 @@ Date.prototype.toJulian = function() {
 }
 
 function date_elapsedDaysToSpinionLunitionOrbion(elapsedDays) {
-  const { ORBION_DURATION, NUIRON_DURATION, LUNITION_DURATION } = Date.CTU;
-
   let orbion = (elapsedDays / ORBION_DURATION);
   let spinionOfOrbion = Math.mod(elapsedDays, ORBION_DURATION);
   let lunition, spinion;
