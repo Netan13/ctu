@@ -142,9 +142,7 @@ function date_elapsedDaysToSpinionLunitionOrbion(elapsedDays) {
 
 function date_compute(date) {
   const d = (date instanceof Date) ? date : new Date(date);
-  if (Number.isNaN(d.getTime())) throw new Error("Invalid date for CTU.compute");
-
-  const { ORIGIN_UEC, SPINION_DURATION, LUNITIONS } = Date.CTU;
+  if (Number.isNaN(d.getTime())) throw new Error("Invalid date for date_compute");
 
   const jd = d.toJulian();
   const elapsedDays = jd - ORIGIN_UEC;
