@@ -8,8 +8,8 @@
 })();
 
 function elapsedDaysToSpinionLunitionOrbion(elapsedDays) {
-    let orbion = (elapsedDays / 365.2422);
-    let spinionOfOrbion = (elapsedDays % 365.2422);
+    let orbion = (elapsedDays / ORBION_DURATION);
+    let spinionOfOrbion = (elapsedDays % ORBION_DURATION);
     let lunition, spinion;
     
     if (orbion === 0 && spinionOfOrbion === 0) {
