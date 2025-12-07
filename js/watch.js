@@ -9,7 +9,7 @@
     if (!Date.CTU || typeof Date.CTU.compute !== 'function') {
       elDate.textContent = 'CTU non dispo';
       elTime.textContent = '—';
-      elMeta.textContent = 'Tu as bien chargé ./js/date.js (avec le patch CTU) ?';
+      elMeta.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
       return;
     }
 

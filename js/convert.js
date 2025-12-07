@@ -26,7 +26,7 @@
     if (typeof date.toCTU !== 'function') {
       elOutDate.textContent = 'CTU non dispo';
       elOutTime.textContent = '—';
-      elOutMeta.textContent = 'Tu as bien chargé ./js/date.js (avec le patch CTU) ?';
+      elOutMeta.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
       return;
     }
 
