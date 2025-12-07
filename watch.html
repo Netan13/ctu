@@ -1,195 +1,24 @@
 <!doctype html>
 <html lang="fr">
 <head>
+    <title>UEC</title>
+	<link rel="apple-touch-icon" href="img/icon-512.ico" />
+	<link rel="icon" type="image/ico" sizes="512x512" href="img/icon-512.ico" />
+	<link rel="stylesheet" href="css/watch.css" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<meta name="description" content="Universal Earth Calendar" />
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>CTU — Watch</title>
-    <style>
-        /* reprend la font-family et les tailles du site */
-        html {
-            font-family: 'Courier New', sans-serif, monospace;
-            transition: background 0.3s, color 0.3s;
-            height: 100%;
-        }
-        body {
-            height: 100%;
-            display: flex;
-            flex-flow: column;
-            justify-content: center;
-            margin: auto;
-            background: #121212;
-            color: #e0e0e0;
-        }
-
-        .wrap {
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            justify-content:center;
-            height:100%;
-            padding:10px;
-            box-sizing:border-box;
-            text-align:center;
-        }
-
-        /* date = spinion + lunition + orbion, même taille que le site */
-        .date {
-            flex-wrap: wrap;
-            font-size: 30pt;     /* identique au site */
-            font-weight: 600;
-            text-transform: capitalize;
-            margin-bottom: 6px;
-        }
-
-        /* time reprend la taille des <p> du site (monospace, 20pt) */
-        .time {
-            font-family: monospace;
-            font-size: 20pt;     /* identique au site */
-            font-weight: 400;
-            letter-spacing: 0.02em;
-        }
-
-        .btns {
-            position:absolute;
-            right:8px;
-            top:8px;
-            display:flex;
-            flex-direction:column;
-            gap:8px;
-        }
-        button {
-            background: rgba(255,255,255,0.08);
-            border: 0;
-            padding: 8px;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 14px;
-        }
-
-        @media (prefers-color-scheme: light) {
-            body { background: #ffffff; color: #222222; }
-            button { color: #000; background: rgba(0,0,0,0.06); }
-        }
-    </style>
 </head>
 <body>
-<div class="wrap">
-    <div class="date" id="ctu-date">— — —</div>
-    <div class="time" id="ctu-time">--:--:-- CTU</div>
-</div>
-
-<div class="btns" style=display: none;>
-    <button id="btn1">Ouvrir site</button>
-    <button id="btn2">Action</button>
-</div>
-
-<script>
-    // ---- CTU logic (fidèle au repo) ----
-    const ORIGIN_UEC = 1486102.5;
-    const LUNITIONS = ["Nuiron","Kelva","Drenae","Vellune","Rokel","Cereon","Elvora","Zailun","Aruel","Thylis","Velunor","Ombran","Siliane"];
-    const NUIRON_DURATION = 11;
-    const LUNITION_DURATION = 29;
-    const SPINION_DURATION = 86400;
-
-    function mod(a,n){ let r = a % n; return r < 0 ? r + n : r; }
-    function toJulian(d){ return d.getTime()/86400000 - (d.getTimezoneOffset()/1440) + 2440587.5; }
-
-    function elapsedDaysToSpinionLunitionOrbion(elapsedDays){
-        let orbion = (elapsedDays / 365.2422);
-        let spinionOfOrbion = mod(elapsedDays, 365.2422);
-        let lunition, spinion;
-        if (Math.abs(orbion) < 1e-12 && Math.abs(spinionOfOrbion) < 1e-12) {
-            lunition = 1; spinion = 1;
-        } else {
-            if (orbion > 0) {
-                if (spinionOfOrbion < NUIRON_DURATION) {
-                    lunition = 0; spinion = spinionOfOrbion;
-                } else {
-                    spinionOfOrbion -= NUIRON_DURATION;
-                    lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
-                    spinion = spinionOfOrbion % LUNITION_DURATION;
-                }
-            } else {
-                lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
-                spinion = spinionOfOrbion % LUNITION_DURATION;
-            }
-            if (spinion === 0) spinion = 0; else spinion += 1;
-        }
-        spinion = Math.floor(spinion);
-        lunition = Math.floor(lunition % 13);
-        orbion = Math.floor(orbion);
-        return { spinion, lunition, orbion };
-    }
-
-    function computeCTU(date){
-        const jd = toJulian(date);
-        const elapsedDays = jd - ORIGIN_UEC;
-        const elapsedSeconds = elapsedDays * SPINION_DURATION;
-        const {spinion, lunition, orbion} = elapsedDaysToSpinionLunitionOrbion(elapsedDays);
-        const secondsToSpinion = mod(elapsedSeconds, SPINION_DURATION);
-        const fraction = secondsToSpinion / SPINION_DURATION;
-
-        const spinor = Math.floor(fraction * 20);
-        const minorInt = Math.floor((fraction * 2000) % 100);
-        const secorInt = Math.floor((fraction * 200000) % 100);
-
-        return {
-            spinion, lunition, orbion,
-            spinor,
-            minor: minorInt,
-            secor: secorInt,
-            secondsIntoSpinion: secondsToSpinion
-        };
-    }
-
-    // ---- UI update with requestAnimationFrame (fluid while visible) ----
-    const elDate = document.getElementById('ctu-date');
-    const elTime = document.getElementById('ctu-time');
-    let rafId = null;
-    let running = false;
-
-    function pad2(n){ return String(n).padStart(2,'0'); }
-
-    function renderOnce(){
-        const now = new Date();
-        const s = computeCTU(now);
-        elDate.textContent = `${s.spinion} ${LUNITIONS[s.lunition]} ${s.orbion}`;
-        elTime.textContent = `${pad2(s.spinor)}:${pad2(s.minor)}:${pad2(s.secor)} CTU`;
-    }
-
-    function loop(){
-        renderOnce();
-        rafId = requestAnimationFrame(loop);
-    }
-
-    function startTick(){
-        if (running) return;
-        running = true;
-        renderOnce();
-        rafId = requestAnimationFrame(loop);
-    }
-
-    function stopTick(){
-        if (!running) return;
-        cancelAnimationFrame(rafId);
-        rafId = null;
-        running = false;
-        renderOnce();
-    }
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') startTick();
-        else stopTick();
-    });
-
-    // initial
-    if (document.visibilityState === 'visible') startTick();
-    else renderOnce();
-
-    // buttons
-    document.getElementById('btn1').addEventListener('click', ()=>{ window.location.href = 'https://netan13.github.io/ctu/'; });
-    document.getElementById('btn2').addEventListener('click', ()=>{ window.location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent('CTU Action'); });
-
-</script>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="big" id="ctu-date">—</div>
+      <div class="mid" id="ctu-time">—</div>
+      <div class="muted" id="ctu-meta">—</div>
+    </section>
+  </main>
+  <script src="js/date.js"></script>
+  <script src="js/watch.js"></script>
 </body>
 </html>

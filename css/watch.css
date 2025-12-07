@@ -1,0 +1,78 @@
+html {
+  font-family: 'Courier New', sans-serif, monospace;
+  transition: background 0.3s, color 0.3s;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #121212;
+  color: #e0e0e0;
+}
+
+.wrap {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 20px 14px 40px;
+  box-sizing: border-box;
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.link {
+  color: inherit;
+  opacity: 0.8;
+  text-decoration: none;
+}
+.link:hover { opacity: 1; text-decoration: underline; }
+
+.card {
+  border-radius: 14px;
+  padding: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.big {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: capitalize;
+}
+
+.mid {
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 650;
+  opacity: 0.92;
+}
+
+.muted {
+  margin-top: 12px;
+  opacity: 0.75;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+@media (max-width: 480px) {
+  .big { font-size: 38px; }
+  .mid { font-size: 20px; }
+}
+
+@media (prefers-color-scheme: light) {
+  body { background: #ffffff; color: #222222; }
+  .card { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
+}

@@ -89,6 +89,96 @@ Date.prototype.toJulian = function() {
        + epochJD;
 }
 
+Date.CTU = Object.freeze({
+  // UEC Origin : June 15th -763 BC 12:00am GMT+3 (cf index.js)
+  ORIGIN_UEC: 1486102.5,
+  LUNITIONS: Object.freeze([
+    "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
+    "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
+  ]),
+  NUIRON_DURATION: 11,
+  LUNITION_DURATION: 29,
+  SPINION_DURATION: 86400,
+  ORBION_DURATION: 365.2422
+});
+
+Date.CTU.elapsedDaysToSpinionLunitionOrbion = function (elapsedDays) {
+  const { ORBION_DURATION, NUIRON_DURATION, LUNITION_DURATION } = Date.CTU;
+
+  let orbion = (elapsedDays / ORBION_DURATION);
+  let spinionOfOrbion = Math.mod(elapsedDays, ORBION_DURATION);
+  let lunition, spinion;
+
+  // instant 0 : 1/1/0
+  if (Math.abs(orbion) < 1e-12 && Math.abs(spinionOfOrbion) < 1e-12) {
+    lunition = 1;
+    spinion = 1;
+  } else {
+    if (orbion > 0) {
+      // orbion "normal" : Nuiron existe
+      if (spinionOfOrbion < NUIRON_DURATION) {
+        lunition = 0;
+        spinion = spinionOfOrbion; // spinion peut valoir 0
+      } else {
+        spinionOfOrbion -= NUIRON_DURATION;
+        lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
+        spinion = spinionOfOrbion % LUNITION_DURATION;
+      }
+    } else {
+      // orbion <= 0 : pas de Nuiron
+      lunition = (spinionOfOrbion / LUNITION_DURATION) + 1;
+      spinion = spinionOfOrbion % LUNITION_DURATION;
+    }
+
+    if (spinion === 0) spinion = 0;
+    else spinion += 1;
+  }
+
+  spinion = Math.floor(spinion);
+  lunition = Math.floor(lunition % 13);
+  orbion = Math.floor(orbion);
+
+  return { spinion, lunition, orbion };
+};
+
+Date.CTU.compute = function (date) {
+  const d = (date instanceof Date) ? date : new Date(date);
+  if (Number.isNaN(d.getTime())) throw new Error("Invalid date for CTU.compute");
+
+  const { ORIGIN_UEC, SPINION_DURATION, LUNITIONS } = Date.CTU;
+
+  const jd = d.toJulian();
+  const elapsedDays = jd - ORIGIN_UEC;
+  const elapsedSeconds = elapsedDays * SPINION_DURATION;
+
+  const { spinion, lunition, orbion } =
+    Date.CTU.elapsedDaysToSpinionLunitionOrbion(elapsedDays);
+
+  const secondsToSpinion = Math.mod(elapsedSeconds, SPINION_DURATION);
+  const fraction = secondsToSpinion / SPINION_DURATION;
+
+  const spinor = Math.floor(fraction * 20);
+  const minor = Math.floor((fraction * 2000) % 100);
+  const secor = Math.floor((fraction * 200000) % 100);
+
+  return {
+    spinion,
+    lunition,
+    lunitionName: LUNITIONS[lunition],
+    orbion,
+    spinor,
+    minor,
+    secor,
+    secondsIntoSpinion: secondsToSpinion,
+    julianDay: jd,
+    elapsedDays
+  };
+};
+
+Date.prototype.toCTU = function () {
+  return Date.CTU.compute(this);
+};
+
 Date.DEGREES_PER_HOUR = 360 / 24;
 
 

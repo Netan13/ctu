@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CTU — Convert</title>
+  <link rel="stylesheet" href="css/convert.css" />
+</head>
+
+<body>
+  <main class="wrap">
+    <section class="card">
+      <label for="dt">Date & heure (locale)</label>
+
+      <div class="row">
+        <input id="dt" type="datetime-local" step="1" />
+        <button id="btn-now" type="button">Maintenant</button>
+        <button id="btn-convert" type="button">Convertir</button>
+      </div>
+
+      <div class="out" aria-live="polite">
+        <div class="big" id="out-date">—</div>
+        <div class="big" id="out-time">—</div>
+        <div class="muted" id="out-meta">—</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- dépendances -->
+  <script src="js/date.js"></script>
+  <script src="js/convert.js"></script>
+</body>
+</html>
