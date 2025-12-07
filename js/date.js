@@ -9,7 +9,7 @@ const LUNITIONS = [
 const NUIRON_DURATION = 11;
 const LUNITION_DURATION = 29;
 const SPINION_DURATION = 86400;
-const ORBION_DURATION: 365.2422;
+const ORBION_DURATION = 365.2422;
 
 Date.prototype.sunrise = function(latitude, longitude, zenith) {
 	return this.sunriseSet(latitude, longitude, true, zenith);
