@@ -1,4 +1,10 @@
 (function () {
+	const elDt = document.getElementById('dt');
+	const elOutDate = document.getElementById('out-date');
+	const elOutTime = document.getElementById('out-time');
+	const btnNow = document.getElementById('btn-now');
+	const btnConvert = document.getElementById('btn-convert');
+
 	if (navigator.language === 'fr-FR') {
 		document.title = "CTU - Convertisseur";
         document.querySelector('meta[name="description"]')?.setAttribute("content", "Calendrier Terrestre Universel - Convertisseur de date");
@@ -18,12 +24,6 @@
 	// init
 	btnNow.click();
 })();
-
-const elDt = document.getElementById('dt');
-const elOutDate = document.getElementById('out-date');
-const elOutTime = document.getElementById('out-time');
-const btnNow = document.getElementById('btn-now');
-const btnConvert = document.getElementById('btn-convert');
 
 function pad2(n) {
 	return String(n).padStart(2, '0');

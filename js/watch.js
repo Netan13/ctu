@@ -1,4 +1,7 @@
 (function () {
+	const elDate = document.getElementById('ctu-date');
+	const elTime = document.getElementById('ctu-time');
+	
 	if (navigator.language === 'fr-FR') {
 		document.title = "CTU";
         document.querySelector('meta[name="description"]')?.setAttribute("content", "Calendrier Terrestre Universel");
@@ -6,9 +9,6 @@
 
 	tick();
 })();
-
-const elDate = document.getElementById('ctu-date');
-const elTime = document.getElementById('ctu-time');
 
 function pad2(n) {
 	return String(n).padStart(2, '0');
