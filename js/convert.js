@@ -2,7 +2,6 @@
   const elDt = document.getElementById('dt');
   const elOutDate = document.getElementById('out-date');
   const elOutTime = document.getElementById('out-time');
-  const elOutMeta = document.getElementById('out-meta');
   const btnNow = document.getElementById('btn-now');
   const btnConvert = document.getElementById('btn-convert');
 
@@ -19,21 +18,18 @@
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
       elOutDate.textContent = 'Date invalide';
       elOutTime.textContent = '—';
-      elOutMeta.textContent = '—';
       return;
     }
 
     if (typeof date.toCTU !== 'function') {
       elOutDate.textContent = 'CTU non dispo';
-      elOutTime.textContent = '—';
-      elOutMeta.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
+      elOutTime.textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
       return;
     }
 
     const c = date.toCTU();
     elOutDate.textContent = `${c.spinion} ${c.lunitionName} ${c.orbion}`;
     elOutTime.textContent = `${pad2(c.spinor)}:${pad2(c.minor)}:${pad2(c.secor)} CTU`;
-    elOutMeta.textContent = `Entrée locale : ${date.toString()}`;
   }
 
   btnNow.addEventListener('click', () => {
