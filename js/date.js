@@ -1,38 +1,47 @@
-// UEC Origin : June 15th -763 BC 12:00am GMT+3
-// The Assyrian eclipse, also known as the Bur-Sagale eclipse.
+// CTU — core date/time logic (Option A: Reference meridian = Ninive/Mossoul)
 //
-// Convention CTU : Bur-Sagale = 1/1/0000 at 10:00:00 CTU
-// - Solion changes at anti-zenith (midnight) in UTC (stable universal rule).
-// - Clock is sidereal (GMST), with a phase offset so that ORIGIN maps to 10:00:00.
+// Bur-Sagale eclipse defines:
+// - a reference instant: ORIGIN_UEC (Julian Day)
+// - a reference location: REF_LONGITUDE_DEG (meridian of reference)
+//
+// Conventions:
+// - Calendar: solion/lunition are 1-based for display (origin => 1/1/0000)
+// - Solion switches at anti-zenith (midnight) ON THE REFERENCE MERIDIAN
+// - Clock: decor/milor/cenor tick at sidereal rate (1 decor = π/10 rad => 20 decor per spin)
+// - Clock is a "day clock" anchored to reference midnight, with a phase offset such that
+//   ORIGIN_UEC displays 10:00:00 CTU.
 
 const ORIGIN_UEC = 1486102.5;
 
+// Reference meridian (Ninive/Mossoul). Adjust if you want finer anchoring.
+const REF_LONGITUDE_DEG = 43.15; // ~ Mosul / Nineveh (east positive)
+
+// Calendar naming
 const LUNITIONS = [
     "Nuiron", "Kelva", "Drenae", "Vellune", "Rokel", "Cereon",
     "Elvora", "Zailun", "Aruel", "Thylis", "Velunor", "Ombran", "Siliane"
 ];
 
-// Calendar shaping (your CTU calendar conventions)
-const NUIRON_DURATION = 11;
-const LUNITION_DURATION = 29;
+// Calendar shaping (your CTU conventions)
+const NUIRON_DURATION = 11;  // solions
+const LUNITION_DURATION = 29; // solions
 
-// Julian Day uses 86400s days by definition (civil day base)
+// Julian Day uses 86400s per day by definition
 const SOLION_DURATION = 86400;
 
-// Mean tropical year used by your calendar math
+// Used by your calendar math (mean tropical year)
 const ORBION_DURATION = 365.2422;
 
-// -----------------------------
-// Sunrise / Sunset (unchanged)
-// -----------------------------
+// Mean sidereal day length in seconds
+const SIDEREAL_DAY_SECONDS = 86164.0905;
+
+// --- Sunrise / Sunset (unchanged) ---
 Date.prototype.sunrise = function (latitude, longitude, zenith) {
     return this.sunriseSet(latitude, longitude, true, zenith);
 };
-
 Date.prototype.sunset = function (latitude, longitude, zenith) {
     return this.sunriseSet(latitude, longitude, false, zenith);
 };
-
 Date.prototype.sunriseSet = function (latitude, longitude, sunrise, zenith) {
     if (!zenith) zenith = 90.8333;
 
@@ -94,21 +103,32 @@ Date.prototype.sunriseSet = function (latitude, longitude, sunrise, zenith) {
     return new Date(milli);
 };
 
-// -----------------------------
-// Julian Day in UTC (NO timezone offset)
-// This is mandatory for GMST and stable day counting.
-// -----------------------------
+// --- Julian Day in UTC (no timezone offset) ---
 Date.prototype.toJulian = function () {
     const msPerDay = 86400000;
     const epochJD = 2440587.5;
     return (this.getTime() / msPerDay) + epochJD;
 };
 
-// -----------------------------
-// Calendar: elapsed solions -> (solion, lunition, orbion)
-// 1-based solion/lunition for display conventions.
-// -----------------------------
-function date_elapsedSolionsToCalendar(elapsedSolionsInt) {
+// --- Reference-meridian helpers ---
+function jdToJdRef(jdUtc) {
+    // Shift by longitude: +λ/360 day
+    return jdUtc + (REF_LONGITUDE_DEG / 360);
+}
+
+function jdnFromJdRef(jdRef) {
+    // JDN changes at midnight on the reference meridian
+    return Math.floor(jdRef + 0.5);
+}
+
+function fracDayFromJdRef(jdRef) {
+    // Fraction of the reference day since reference midnight.
+    // Using (jdRef + 0.5) so 0 corresponds to reference midnight.
+    return Math.mod(jdRef + 0.5, 1);
+}
+
+// --- Calendar mapping (1-based solion/lunition; origin => 1/1/0000) ---
+function elapsedSolionsToCalendar(elapsedSolionsInt) {
     let orbion = Math.floor(elapsedSolionsInt / ORBION_DURATION);
     let solionOfOrbion = Math.mod(elapsedSolionsInt, ORBION_DURATION);
 
@@ -126,7 +146,7 @@ function date_elapsedSolionsToCalendar(elapsedSolionsInt) {
             solion = Math.floor(solionOfOrbion % LUNITION_DURATION) + 1;   // 1..29
         }
     } else {
-        // Legacy rule: negative orbions without Nuiron
+        // Legacy behavior for negative orbions: no Nuiron
         lunition = 2 + Math.floor(solionOfOrbion / LUNITION_DURATION);
         solion = Math.floor(solionOfOrbion % LUNITION_DURATION) + 1;
 
@@ -135,59 +155,46 @@ function date_elapsedSolionsToCalendar(elapsedSolionsInt) {
     }
 
     const lunitionIndex = lunition - 1;
-    return {solion, lunition, lunitionIndex, orbion};
+    return { solion, lunition, lunitionIndex, orbion };
 }
 
-// -----------------------------
-// Sidereal clock: GMST (UTC JD) + phase offset
-// decor = π/10 rad => 20 decor per spin
-// milor, cenor are base-100 subdivisions
-// -----------------------------
-function gmstRadiansFromJD(jd) {
-    const T = (jd - 2451545.0) / 36525.0;
+// --- Clock: sidereal-rate day clock anchored to reference midnight ---
+function spinFractionFromJdRef(jdRef) {
+    // Seconds since reference midnight (solar seconds):
+    const fDay = fracDayFromJdRef(jdRef);     // 0..1
+    const tSolar = fDay * SOLION_DURATION;    // 0..86400
 
-    let gmstDeg =
-        280.46061837 +
-        360.98564736629 * (jd - 2451545.0) +
-        0.000387933 * T * T -
-        (T * T * T) / 38710000.0;
-
-    gmstDeg = ((gmstDeg % 360) + 360) % 360;
-    return (gmstDeg * Math.PI) / 180;
+    // Convert solar seconds to sidereal fraction of a spin.
+    // One sidereal spin = SIDEREAL_DAY_SECONDS.
+    const fSpin = Math.mod(tSolar / SIDEREAL_DAY_SECONDS, 1);
+    return fSpin;
 }
 
-const TWO_PI = 2 * Math.PI;
-
-// ORIGIN should display 10:00:00 => decor=10 => fraction=10/20=0.5 => angle=π
-const ORIGIN_TARGET_THETA = Math.PI;
-
-const CLOCK_PHASE_OFFSET = (() => {
-    const thetaAtOrigin = gmstRadiansFromJD(ORIGIN_UEC);
-    let off = ORIGIN_TARGET_THETA - thetaAtOrigin;
-    off = ((off % TWO_PI) + TWO_PI) % TWO_PI;
-    return off;
+// Phase offset so ORIGIN_UEC shows 10:00:00 (decor=10 => fraction 0.5)
+const ORIGIN_TARGET_SPIN_FRACTION = 0.5;
+const CLOCK_PHASE_OFFSET_FRACTION = (() => {
+    const jdRefOrigin = jdToJdRef(ORIGIN_UEC);
+    const fOrigin = spinFractionFromJdRef(jdRefOrigin);
+    // We want (fOrigin + offset) mod 1 = 0.5
+    return Math.mod(ORIGIN_TARGET_SPIN_FRACTION - fOrigin, 1);
 })();
 
-function date_siderealClockFromJD(jd) {
-    let theta = gmstRadiansFromJD(jd);
-    theta = (theta + CLOCK_PHASE_OFFSET) % TWO_PI;
+function clockFromJdRef(jdRef) {
+    let fSpin = spinFractionFromJdRef(jdRef);
+    fSpin = Math.mod(fSpin + CLOCK_PHASE_OFFSET_FRACTION, 1);
 
-    const frac = theta / TWO_PI;
+    // 20 decor per spin, then base-100 subdivisions
+    const decor = Math.floor(fSpin * 20);               // 0..19
+    const milor = Math.floor((fSpin * 2000) % 100);     // 0..99
+    const cenor = Math.floor((fSpin * 200000) % 100);   // 0..99
 
-    const decor = Math.floor(frac * 20);               // 0..19
-    const milor = Math.floor((frac * 2000) % 100);     // 0..99
-    const cenor = Math.floor((frac * 200000) % 100);   // 0..99
-
-    return {decor, milor, cenor, siderealFraction: frac, siderealRadians: theta};
+    return { decor, milor, cenor, spinFraction: fSpin };
 }
 
-// -----------------------------
-// Formatting helpers
-// -----------------------------
+// --- Formatting helpers ---
 function ctu_pad2(n) {
     return String(n).padStart(2, "0");
 }
-
 function ctu_format_time(ctuLike) {
     const decor = ctuLike.decor ?? ctuLike.spinor ?? 0;
     const milor = ctuLike.milor ?? ctuLike.minor ?? 0;
@@ -195,57 +202,57 @@ function ctu_format_time(ctuLike) {
     return `${ctu_pad2(decor)}:${ctu_pad2(milor)}:${ctu_pad2(cenor)}`;
 }
 
-// -----------------------------
-// Main compute
-// -----------------------------
+// --- Main compute ---
 function date_compute(date) {
     const d = (date instanceof Date) ? date : new Date(date);
     if (Number.isNaN(d.getTime())) throw new Error("Invalid date for date_compute");
 
-    const jd = d.toJulian();
+    const jdUtc = d.toJulian();
+    const jdRef = jdToJdRef(jdUtc);
 
-    // JDN changes at midnight (UTC) when using UTC JD:
-    const jdnNow = Math.floor(jd + 0.5);
-    const jdnOrigin = Math.floor(ORIGIN_UEC + 0.5);
+    // solion switching at reference midnight
+    const jdnNowRef = jdnFromJdRef(jdRef);
+    const jdnOriginRef = jdnFromJdRef(jdToJdRef(ORIGIN_UEC));
+    const elapsedSolions = jdnNowRef - jdnOriginRef; // integer, changes at ref midnight
 
-    const elapsedSolions = jdnNow - jdnOrigin; // integer, changes at UTC midnight
+    // Calendar (1-based)
+    const cal = elapsedSolionsToCalendar(elapsedSolions);
+    const lunitionName = LUNITIONS[cal.lunitionIndex];
 
-    const elapsedDays = jd - ORIGIN_UEC;
-    const elapsedSecondsSolar = elapsedDays * SOLION_DURATION;
+    // Clock (reference day clock, sidereal rate)
+    const clk = clockFromJdRef(jdRef);
 
-    const {solion, lunition, lunitionIndex, orbion} =
-        date_elapsedSolionsToCalendar(elapsedSolions);
-
-    const lunitionName = LUNITIONS[lunitionIndex];
-
-    const clock = date_siderealClockFromJD(jd);
+    // Useful extras
+    const elapsedDaysUtc = jdUtc - ORIGIN_UEC;
+    const elapsedSecondsSolarUtc = elapsedDaysUtc * SOLION_DURATION;
 
     return {
-        // New names
-        solion,
-        lunition,           // 1..13
-        lunitionIndex,      // 0..12
+        // Calendar
+        solion: cal.solion,
+        lunition: cal.lunition,          // 1..13
+        lunitionIndex: cal.lunitionIndex,// 0..12
         lunitionName,
-        orbion,
+        orbion: cal.orbion,
 
-        decor: clock.decor,
-        milor: clock.milor,
-        cenor: clock.cenor,
+        // Clock
+        decor: clk.decor,
+        milor: clk.milor,
+        cenor: clk.cenor,
 
         // Legacy aliases (temporary)
-        spinion: solion,
-        spinor: clock.decor,
-        minor: clock.milor,
-        secor: clock.cenor,
+        spinion: cal.solion,
+        spinor: clk.decor,
+        minor: clk.milor,
+        secor: clk.cenor,
 
-        // Extras
-        julianDay: jd,
-        jdnNow,
+        // Debug/extras
+        julianDayUtc: jdUtc,
+        julianDayRef: jdRef,
+        jdnNowRef,
         elapsedSolions,
-        elapsedDays,
-        elapsedSecondsSolar,
-        siderealRadians: clock.siderealRadians,
-        siderealFraction: clock.siderealFraction
+        spinFraction: clk.spinFraction,
+        elapsedDaysUtc,
+        elapsedSecondsSolarUtc
     };
 }
 
@@ -255,29 +262,17 @@ Date.prototype.toCTU = function () {
 
 Date.DEGREES_PER_HOUR = 360 / 24;
 
-// -----------------------------
-// Utility functions
-// -----------------------------
+// --- Utility functions (unchanged style) ---
 Date.prototype.getDayOfYear = function () {
     const onejan = new Date(this.getFullYear(), 0, 1);
     return Math.ceil((this - onejan) / 86400000);
 };
 
-Math.sinDeg = function (deg) {
-    return Math.sin(deg * 2.0 * Math.PI / 360.0);
-};
-Math.acosDeg = function (x) {
-    return Math.acos(x) * 360.0 / (2 * Math.PI);
-};
-Math.asinDeg = function (x) {
-    return Math.asin(x) * 360.0 / (2 * Math.PI);
-};
-Math.tanDeg = function (deg) {
-    return Math.tan(deg * 2.0 * Math.PI / 360.0);
-};
-Math.cosDeg = function (deg) {
-    return Math.cos(deg * 2.0 * Math.PI / 360.0);
-};
+Math.sinDeg = function (deg) { return Math.sin(deg * 2.0 * Math.PI / 360.0); };
+Math.acosDeg = function (x) { return Math.acos(x) * 360.0 / (2 * Math.PI); };
+Math.asinDeg = function (x) { return Math.asin(x) * 360.0 / (2 * Math.PI); };
+Math.tanDeg = function (deg) { return Math.tan(deg * 2.0 * Math.PI / 360.0); };
+Math.cosDeg = function (deg) { return Math.cos(deg * 2.0 * Math.PI / 360.0); };
 
 Math.mod = function (a, b) {
     let result = a % b;
@@ -285,9 +280,10 @@ Math.mod = function (a, b) {
     return result;
 };
 
-// Expose
+// Expose helpers
 window.date_compute = date_compute;
 window.ctu_pad2 = ctu_pad2;
 window.ctu_format_time = ctu_format_time;
 window.LUNITIONS = LUNITIONS;
 window.ORIGIN_UEC = ORIGIN_UEC;
+window.REF_LONGITUDE_DEG = REF_LONGITUDE_DEG;
