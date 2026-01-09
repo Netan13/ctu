@@ -1,30 +1,45 @@
 (function () {
-	if (navigator.language === 'fr-FR') {
-		document.title = "CTU";
-        document.querySelector('meta[name="description"]')?.setAttribute("content", "Calendrier Terrestre Universel");
-	}
+    // Petit ajustement FR
+    if (navigator.language === "fr-FR") {
+        document.title = "CTU";
+        document
+            .querySelector('meta[name="description"]')
+            ?.setAttribute("content", "Calendrier Terrestre Universel");
+    }
 
-	tick();
+    tick();
 })();
 
 function pad2(n) {
-	return String(n).padStart(2, '0');
+    return String(n).padStart(2, "0");
 }
 
 function render(now) {
-	if (typeof date_compute !== 'function') {
-		document.getElementById('ctu-date').textContent = 'CTU non dispo';
-		document.getElementById('ctu-time').textContent = 'Tu as bien chargé date.js (avec le patch CTU) ?';
-		return;
-	}
+    const dateEl = document.getElementById("ctu-date");
+    const timeEl = document.getElementById("ctu-time");
 
-	const c = date_compute(now);
+    if (typeof date_compute !== "function") {
+        dateEl.textContent = "CTU non dispo";
+        timeEl.textContent = "Tu as bien chargé date.js ?";
+        return;
+    }
 
-	document.getElementById('ctu-date').textContent = `${c.spinion} ${c.lunitionName} ${c.orbion}`;
-	document.getElementById('ctu-time').textContent = `${pad2(c.spinor)}:${pad2(c.minor)}:${pad2(c.secor)} CTU`;
+    const c = date_compute(now);
+
+    // Noms nouveaux + fallback anciens
+    const solion = c.solion ?? c.spinion;
+    const lunitionName = c.lunitionName ?? (typeof LUNITIONS !== "undefined" ? LUNITIONS[c.lunition] : "");
+    const orbion = c.orbion;
+
+    const decor = c.decor ?? c.spinor;
+    const milor = c.milor ?? c.minor;
+    const cenor = c.cenor ?? c.secor;
+
+    dateEl.textContent = `${solion} ${lunitionName} ${orbion}`;
+    timeEl.textContent = `${pad2(decor)}:${pad2(milor)}:${pad2(cenor)} CTU`;
 }
 
 function tick() {
-	render(new Date());
-	requestAnimationFrame(tick);
+    render(new Date());
+    requestAnimationFrame(tick);
 }
