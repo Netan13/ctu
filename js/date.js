@@ -8,16 +8,26 @@ Math.mod = function (a, b) {
     return r;
 };
 
-Math.sinDeg = function (deg) { return Math.sin(deg * 2.0 * Math.PI / 360.0); };
-Math.acosDeg = function (x) { return Math.acos(x) * 360.0 / (2 * Math.PI); };
-Math.asinDeg = function (x) { return Math.asin(x) * 360.0 / (2 * Math.PI); };
-Math.tanDeg = function (deg) { return Math.tan(deg * 2.0 * Math.PI / 360.0); };
-Math.cosDeg = function (deg) { return Math.cos(deg * 2.0 * Math.PI / 360.0); };
+Math.sinDeg = function (deg) {
+    return Math.sin(deg * 2.0 * Math.PI / 360.0);
+};
+Math.acosDeg = function (x) {
+    return Math.acos(x) * 360.0 / (2 * Math.PI);
+};
+Math.asinDeg = function (x) {
+    return Math.asin(x) * 360.0 / (2 * Math.PI);
+};
+Math.tanDeg = function (deg) {
+    return Math.tan(deg * 2.0 * Math.PI / 360.0);
+};
+Math.cosDeg = function (deg) {
+    return Math.cos(deg * 2.0 * Math.PI / 360.0);
+};
 
 Date.DEGREES_PER_HOUR = 360 / 24;
 
 Date.prototype.getDayOfYear = function () {
-    const onejan = new Date(this.getFullYear(), 0, 1);
+    let onejan = new Date(this.getFullYear(), 0, 1);
     return Math.ceil((this - onejan) / 86400000);
 };
 
@@ -25,10 +35,15 @@ Date.prototype.getDayOfYear = function () {
 // Constants
 // =========================
 
-// UEC Origin : June 15th -763 BC 12:00pm GMT+3
-// The Assyrian eclipse, also known as the Bur-Sagale eclipse.
-// The first precisely dated astronomical event
-const ORIGIN_UEC = 1442902.875;
+// ORIGIN_UEC = instant de l'éclipse (zénith / midi) à Ninive/Mossoul (référence)
+// Choix : on garde la simplicité d'usage -> les solions basculent à minuit.
+// Donc le "début du solion 1" (minuit) est dérivé de l'éclipse : ORIGIN0_UEC = ORIGIN_UEC - 0.5
+//
+// Note: ORIGIN_UEC est traité comme déjà cohérent avec la référence (pas de re-shift).
+const ORIGIN_UEC = 1442902.875;      // Eclipse @ noon (GMT+3) for Bur-Sagale day (reference)
+const ORIGIN0_UEC = ORIGIN_UEC - 0.5; // Same day @ midnight (anti-zénith), reference solion boundary
+
+// Méridien de référence (Ninive/Mossoul)
 const REF_LONGITUDE_DEG = 43.15;
 
 const LUNITIONS = [
@@ -43,6 +58,7 @@ const ORBION_DURATION = 365.2422;
 
 const SOLION_DURATION = 86400;
 
+// Jour sidéral moyen (s)
 const SIDEREAL_DAY_SECONDS = 86164.0905;
 
 // =========================
@@ -50,8 +66,8 @@ const SIDEREAL_DAY_SECONDS = 86164.0905;
 // =========================
 
 Date.prototype.toJulian = function () {
-    const msPerDay = 86400000;
-    const epochJD = 2440587.5;
+    let msPerDay = 86400000;
+    let epochJD = 2440587.5;
     return (this.getTime() / msPerDay) + epochJD;
 };
 
@@ -70,14 +86,14 @@ Date.prototype.sunset = function (latitude, longitude, zenith) {
 Date.prototype.sunriseSet = function (latitude, longitude, sunrise, zenith) {
     if (!zenith) zenith = 90.8333;
 
-    const hoursFromMeridian = longitude / Date.DEGREES_PER_HOUR;
-    const dayOfYear = this.getDayOfYear();
+    let hoursFromMeridian = longitude / Date.DEGREES_PER_HOUR;
+    let dayOfYear = this.getDayOfYear();
 
-    const approx = sunrise
+    let approx = sunrise
         ? dayOfYear + ((6 - hoursFromMeridian) / 24)
         : dayOfYear + ((18.0 - hoursFromMeridian) / 24);
 
-    const M = (0.9856 * approx) - 3.289;
+    let M = (0.9856 * approx) - 3.289;
 
     let L =
         M +
@@ -87,28 +103,28 @@ Date.prototype.sunriseSet = function (latitude, longitude, sunrise, zenith) {
 
     L = Math.mod(L, 360);
 
-    const asc = 0.91764 * Math.tanDeg(L);
+    let asc = 0.91764 * Math.tanDeg(L);
 
     let RA = 360 / (2 * Math.PI) * Math.atan(asc);
     RA = Math.mod(RA, 360);
 
-    const Lq = Math.floor(L / 90) * 90;
-    const RAq = Math.floor(RA / 90) * 90;
+    let Lq = Math.floor(L / 90) * 90;
+    let RAq = Math.floor(RA / 90) * 90;
     RA = (RA + (Lq - RAq)) / Date.DEGREES_PER_HOUR;
 
-    const sinDec = 0.39782 * Math.sinDeg(L);
-    const cosDec = Math.cosDeg(Math.asinDeg(sinDec));
+    let sinDec = 0.39782 * Math.sinDeg(L);
+    let cosDec = Math.cosDeg(Math.asinDeg(sinDec));
 
-    const cosH =
+    let cosH =
         (Math.cosDeg(zenith) - sinDec * Math.sinDeg(latitude)) /
         (cosDec * Math.cosDeg(latitude));
 
     let H = Math.acosDeg(cosH);
     if (sunrise) H = 360 - H;
 
-    const localHour = H / Date.DEGREES_PER_HOUR;
+    let localHour = H / Date.DEGREES_PER_HOUR;
 
-    const T =
+    let T =
         localHour +
         RA -
         (0.06571 * approx) -
@@ -117,7 +133,7 @@ Date.prototype.sunriseSet = function (latitude, longitude, sunrise, zenith) {
     let UT = T - (longitude / Date.DEGREES_PER_HOUR);
     UT = Math.mod(UT, 24);
 
-    const midnight = new Date(0);
+    let midnight = new Date(0);
     midnight.setUTCFullYear(this.getUTCFullYear());
     midnight.setUTCMonth(this.getUTCMonth());
     midnight.setUTCDate(this.getUTCDate());
@@ -150,7 +166,7 @@ function fracDayFromJdRef(jdRef) {
 // =========================
 
 function elapsedSolionsToCalendar(elapsedSolionsInt) {
-    const orbion = Math.floor(elapsedSolionsInt / ORBION_DURATION);
+    let orbion = Math.floor(elapsedSolionsInt / ORBION_DURATION);
     let solionOfOrbion = Math.mod(elapsedSolionsInt, ORBION_DURATION);
 
     let lunition; // 1..13
@@ -173,8 +189,8 @@ function elapsedSolionsToCalendar(elapsedSolionsInt) {
         while (lunition < 1) lunition += 13;
     }
 
-    const lunitionIndex = lunition - 1;
-    return { solion, lunition, lunitionIndex, orbion };
+    let lunitionIndex = lunition - 1;
+    return {solion, lunition, lunitionIndex, orbion};
 }
 
 // =========================
@@ -182,20 +198,17 @@ function elapsedSolionsToCalendar(elapsedSolionsInt) {
 // =========================
 
 function spinFractionFromJdRef(jdRef) {
-    const fDay = fracDayFromJdRef(jdRef);   // 0..1 (solar day fraction)
-    const tSolar = fDay * SOLION_DURATION;  // seconds since ref midnight (solar seconds)
-
-    // Convert to sidereal-spin fraction:
+    let fDay = fracDayFromJdRef(jdRef);   // 0..1 (solar day fraction)
+    let tSolar = fDay * SOLION_DURATION;  // seconds since ref midnight (solar seconds)
     // one spin = SIDEREAL_DAY_SECONDS
     return Math.mod(tSolar / SIDEREAL_DAY_SECONDS, 1);
 }
 
-// Calibration: at eclipse moment (ORIGIN_UEC + 0.5), CTU time must be 10:00:00
+// Calibration: at eclipse moment (ORIGIN_UEC), CTU time must be 10:00:00
 const TARGET_SPIN_FRACTION_AT_ECLIPSE = 0.5; // 10/20
 const CLOCK_PHASE_OFFSET_FRACTION = (() => {
-    // ORIGIN_UEC is already in reference JD => do NOT shift it.
-    const eclipseMoment = ORIGIN_UEC + 0.5;
-    const fEclipse = spinFractionFromJdRef(eclipseMoment);
+    // ORIGIN_UEC is the eclipse instant in reference JD => do NOT shift it.
+    let fEclipse = spinFractionFromJdRef(ORIGIN_UEC);
     return Math.mod(TARGET_SPIN_FRACTION_AT_ECLIPSE - fEclipse, 1);
 })();
 
@@ -203,11 +216,11 @@ function clockFromJdRef(jdRef) {
     let fSpin = spinFractionFromJdRef(jdRef);
     fSpin = Math.mod(fSpin + CLOCK_PHASE_OFFSET_FRACTION, 1);
 
-    const decor = Math.floor(fSpin * 20);            // 0..19
-    const milor = Math.floor((fSpin * 2000) % 100);  // 0..99
-    const cenor = Math.floor((fSpin * 200000) % 100);// 0..99
+    let decor = Math.floor(fSpin * 20);             // 0..19
+    let milor = Math.floor((fSpin * 2000) % 100);   // 0..99
+    let cenor = Math.floor((fSpin * 200000) % 100); // 0..99
 
-    return { decor, milor, cenor, spinFraction: fSpin };
+    return {decor, milor, cenor, spinFraction: fSpin};
 }
 
 // =========================
@@ -219,9 +232,9 @@ function ctu_pad2(n) {
 }
 
 function ctu_format_time(ctuLike) {
-    const decor = ctuLike.decor ?? ctuLike.spinor ?? 0;
-    const milor = ctuLike.milor ?? ctuLike.minor ?? 0;
-    const cenor = ctuLike.cenor ?? ctuLike.secor ?? 0;
+    let decor = ctuLike.decor ?? ctuLike.spinor ?? 0;
+    let milor = ctuLike.milor ?? ctuLike.minor ?? 0;
+    let cenor = ctuLike.cenor ?? ctuLike.secor ?? 0;
     return `${ctu_pad2(decor)}:${ctu_pad2(milor)}:${ctu_pad2(cenor)}`;
 }
 
@@ -230,26 +243,26 @@ function ctu_format_time(ctuLike) {
 // =========================
 
 function date_compute(date) {
-    const d = (date instanceof Date) ? date : new Date(date);
+    let d = (date instanceof Date) ? date : new Date(date);
     if (Number.isNaN(d.getTime())) throw new Error("Invalid date for date_compute");
 
     // "Now" in UTC JD, then mapped to reference-meridian JD
-    const jdUtcNow = d.toJulian();
-    const jdRefNow = jdToJdRefFromUtc(jdUtcNow);
+    let jdUtcNow = d.toJulian();
+    let jdRefNow = jdToJdRefFromUtc(jdUtcNow);
 
-    // Origin is already reference JD midnight => do NOT shift it.
-    const jdnNowRef = jdnFromJdRef(jdRefNow);
-    const jdnOriginRef = jdnFromJdRef(ORIGIN_UEC);
+    // Day boundary for calendar uses ORIGIN0_UEC (midnight reference)
+    let jdnNowRef = jdnFromJdRef(jdRefNow);
+    let jdnOriginRef = jdnFromJdRef(ORIGIN0_UEC);
 
-    const elapsedSolions = jdnNowRef - jdnOriginRef;
+    let elapsedSolions = jdnNowRef - jdnOriginRef;
 
-    const cal = elapsedSolionsToCalendar(elapsedSolions);
-    const lunitionName = LUNITIONS[cal.lunitionIndex];
+    let cal = elapsedSolionsToCalendar(elapsedSolions);
+    let lunitionName = LUNITIONS[cal.lunitionIndex];
 
-    const clk = clockFromJdRef(jdRefNow);
+    let clk = clockFromJdRef(jdRefNow);
 
-    // debug
-    const elapsedDaysUtc = jdUtcNow - ORIGIN_UEC;
+    // debug (UTC elapsed from eclipse instant, not the midnight boundary)
+    let elapsedDaysUtcFromEclipse = jdUtcNow - ORIGIN_UEC;
 
     return {
         // Calendar
@@ -276,9 +289,10 @@ function date_compute(date) {
         jdnNowRef,
         elapsedSolions,
         spinFraction: clk.spinFraction,
-        elapsedDaysUtc,
+        elapsedDaysUtcFromEclipse,
         refLongitudeDeg: REF_LONGITUDE_DEG,
-        originUec: ORIGIN_UEC
+        originUecEclipse: ORIGIN_UEC,
+        originUecMidnight: ORIGIN0_UEC
     };
 }
 
