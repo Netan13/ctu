@@ -28,7 +28,7 @@ Date.prototype.getDayOfYear = function () {
 // UEC Origin : June 15th -763 BC 12:00am GMT+3
 // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
 // The first precisely dated astronomical event
-const ORIGIN_UEC = 1442902.416667;
+const ORIGIN_UEC = 1442902.458333;
 const REF_LONGITUDE_DEG = 43.15;
 
 const LUNITIONS = [
