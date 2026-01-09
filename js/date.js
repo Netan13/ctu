@@ -1,6 +1,11 @@
 // UEC Origin : June 15th -763 BC 12:00am GMT+3
 // The Assyrian eclipse, also known as the Bur-Sagale eclipse.
 // The first precisely dated astronomical event
+//
+// Convention CTU : Bur-Sagale = 1/1/0000 at 10:00:00 CTU
+// - Solion changes at anti-zenith (midnight) for usability.
+// - Clock is sidereal (Earth rotation), with a phase offset so that ORIGIN maps to 10:00:00.
+
 const ORIGIN_UEC = 1486102.5;
 
 const LUNITIONS = [
@@ -13,7 +18,7 @@ const NUIRON_DURATION = 11;
 const LUNITION_DURATION = 29;
 
 // "Solion" as solar day for the civil timeline base.
-// We keep it here because Julian Day is defined with 86400s per day.
+// Kept because Julian Day is defined with 86400s per day.
 const SOLION_DURATION = 86400;
 
 // Mean tropical year (used by your calendar math)
@@ -72,7 +77,6 @@ Date.prototype.sunriseSet = function (latitude, longitude, sunrise, zenith) {
         (cosDec * (Math.cosDeg(latitude)));
 
     let localHourAngle = Math.acosDeg(cosLocalHourAngle);
-
     if (sunrise) localHourAngle = 360 - localHourAngle;
 
     const localHour = localHourAngle / Date.DEGREES_PER_HOUR;
@@ -96,8 +100,9 @@ Date.prototype.sunriseSet = function (latitude, longitude, sunrise, zenith) {
 };
 
 // -----------------------------
-// Julian Day (as in your code)
-// NOTE: kept as-is to avoid breaking your existing baseline.
+// Julian Day (kept as your baseline)
+// NOTE: This uses timezoneOffset; day boundaries will follow local "midnight"
+// as seen by the browser (intended for human habit / simplicity).
 // -----------------------------
 Date.prototype.toJulian = function () {
     const msPerDay = 86400000;
@@ -106,49 +111,53 @@ Date.prototype.toJulian = function () {
 };
 
 // -----------------------------
-// Calendar (orbion/lunition/solion)
+// Calendar (orbion / lunition / solion)
+// - solion changes at anti-zenith (midnight) using JDN
+// - lunition and solion are 1-based for display conventions (Bur-Sagale = 1/1/0000)
 // -----------------------------
-function date_elapsedDaysToSolionLunionOrbion(elapsedDays) {
-    let orbion = (elapsedDays / ORBION_DURATION);
-    let solionOfOrbion = Math.mod(elapsedDays, ORBION_DURATION);
-    let lunition, solion;
+function date_elapsedSolionsToCalendar(elapsedSolionsInt) {
+    // orbion 0 at origin
+    let orbion = Math.floor(elapsedSolionsInt / ORBION_DURATION);
 
-    // instant 0 : 1/1/0
-    if (Math.abs(orbion) < 1e-12 && Math.abs(solionOfOrbion) < 1e-12) {
-        lunition = 1;
-        solion = 1;
-    } else {
-        if (orbion > 0) {
-            // orbion "normal" : Nuiron existe
-            if (solionOfOrbion < NUIRON_DURATION) {
-                lunition = 0;
-                solion = solionOfOrbion; // solion peut valoir 0
-            } else {
-                solionOfOrbion -= NUIRON_DURATION;
-                lunition = (solionOfOrbion / LUNITION_DURATION) + 1;
-                solion = solionOfOrbion % LUNITION_DURATION;
-            }
+    // position inside orbion, in solions (0..ORBION_DURATION)
+    let solionOfOrbion = Math.mod(elapsedSolionsInt, ORBION_DURATION);
+
+    let lunition; // 1..13
+    let solion;   // 1..(lunition length)
+
+    // orbion >= 0 : Nuiron exists and is lunition 1
+    if (orbion >= 0) {
+        if (solionOfOrbion < NUIRON_DURATION) {
+            lunition = 1; // Nuiron
+            solion = Math.floor(solionOfOrbion) + 1; // 1..NUIRON_DURATION
         } else {
-            // orbion <= 0 : pas de Nuiron
-            lunition = (solionOfOrbion / LUNITION_DURATION) + 1;
-            solion = solionOfOrbion % LUNITION_DURATION;
+            solionOfOrbion -= NUIRON_DURATION;
+            lunition = 2 + Math.floor(solionOfOrbion / LUNITION_DURATION); // 2..13
+            solion = Math.floor(solionOfOrbion % LUNITION_DURATION) + 1;   // 1..29
         }
+    } else {
+        // orbion < 0 : keep your legacy rule "no Nuiron"
+        // we map the first lunition in negative orbions to "Kelva" (lunition=2) or keep continuity?
+        // We'll keep the numeric cycle but ensure 1-based output.
+        // Here we start counting from lunition 2 (Kelva) by convention:
+        lunition = 2 + Math.floor(solionOfOrbion / LUNITION_DURATION);
+        solion = Math.floor(solionOfOrbion % LUNITION_DURATION) + 1;
 
-        if (solion === 0) solion = 0;
-        else solion += 1;
+        // wrap to 1..13
+        while (lunition > 13) lunition -= 13;
+        while (lunition < 1) lunition += 13;
     }
 
-    solion = Math.floor(solion);
-    lunition = Math.floor(lunition % 13);
-    orbion = Math.floor(orbion);
-
-    return {solion, lunition, orbion};
+    // lunitionName index is 0..12
+    const lunitionIndex = lunition - 1;
+    return { solion, lunition, lunitionIndex, orbion };
 }
 
 // -----------------------------
-// Sidereal rotation (decor/milor/cenor)
-// decor = π/10 rad => 20 decor per full spin (2π)
-// base 100: milor/ cenor
+// Sidereal rotation (decor / milor / cenor)
+// - decor = π/10 rad => 20 decor per full spin (2π)
+// - base 100: milor, cenor
+// - phase offset so ORIGIN_UEC displays 10:00:00
 // -----------------------------
 function gmstRadiansFromJD(jd) {
     const T = (jd - 2451545.0) / 36525.0;
@@ -163,16 +172,31 @@ function gmstRadiansFromJD(jd) {
     return (gmstDeg * Math.PI) / 180;        // [0,2π)
 }
 
+const TWO_PI = 2 * Math.PI;
+
+// At origin we want 10:00:00 => decor=10 => fraction=10/20=0.5 => angle=π
+const ORIGIN_TARGET_THETA = Math.PI;
+
+// Precomputed phase offset: (thetaOrigin + offset) mod 2π = π
+const CLOCK_PHASE_OFFSET = (() => {
+    const thetaAtOrigin = gmstRadiansFromJD(ORIGIN_UEC);
+    let off = ORIGIN_TARGET_THETA - thetaAtOrigin;
+    off = ((off % TWO_PI) + TWO_PI) % TWO_PI;
+    return off;
+})();
+
 function date_siderealClockFromJD(jd) {
-    const theta = gmstRadiansFromJD(jd);             // [0,2π)
-    const frac = theta / (2 * Math.PI);             // [0,1)
+    let theta = gmstRadiansFromJD(jd);
+    theta = (theta + CLOCK_PHASE_OFFSET) % TWO_PI;
+
+    const frac = theta / TWO_PI; // [0,1)
 
     // 20 decor per spin, then base-100 subdivisions
-    const decor = Math.floor(frac * 20);             // 0..19
-    const milor = Math.floor((frac * 2000) % 100);   // 0..99
-    const cenor = Math.floor((frac * 200000) % 100); // 0..99
+    const decor = Math.floor(frac * 20);               // 0..19
+    const milor = Math.floor((frac * 2000) % 100);     // 0..99
+    const cenor = Math.floor((frac * 200000) % 100);   // 0..99
 
-    return {decor, milor, cenor, siderealFraction: frac, siderealRadians: theta};
+    return { decor, milor, cenor, siderealFraction: frac, siderealRadians: theta };
 }
 
 // -----------------------------
@@ -198,45 +222,48 @@ function date_compute(date) {
 
     const jd = d.toJulian();
 
-    // Jours entiers basculant à minuit :
+    // JDN (Julian Day Number) changes at midnight:
     const jdnNow = Math.floor(jd + 0.5);
     const jdnOrigin = Math.floor(ORIGIN_UEC + 0.5);
 
-    // Nombre de solions écoulés (entier), bascule à minuit :
+    // Integer solion index from origin (0 at origin's midnight)
     const elapsedSolions = jdnNow - jdnOrigin;
 
-    // Garde aussi elapsedDays (continu) si tu veux des fractions ailleurs :
+    // Continuous elapsed days from origin (useful for gaps/debug)
     const elapsedDays = jd - ORIGIN_UEC;
-
-    // Calendar
-    const {solion, lunition, orbion} =
-        date_elapsedDaysToSolionLunionOrbion(elapsedSolions);
-
-    // Clock (sidereal)
-    const clock = date_siderealClockFromJD(jd);
-
-    // For legacy/debug
     const elapsedSecondsSolar = elapsedDays * SOLION_DURATION;
 
+    // Calendar (1-based solion/lunition), orbion 0 at origin
+    const { solion, lunition, lunitionIndex, orbion } =
+        date_elapsedSolionsToCalendar(elapsedSolions);
+
+    const lunitionName = LUNITIONS[lunitionIndex];
+
+    // Clock (sidereal + phase offset)
+    const clock = date_siderealClockFromJD(jd);
+
     return {
-        // new names
+        // New names
         solion,
-        lunition,
-        lunitionName: LUNITIONS[lunition],
+        lunition,           // 1..13
+        lunitionIndex,      // 0..12
+        lunitionName,
         orbion,
 
         decor: clock.decor,
         milor: clock.milor,
         cenor: clock.cenor,
 
-        // legacy aliases (temporary)
+        // Legacy aliases (temporary)
         spinion: solion,
         spinor: clock.decor,
         minor: clock.milor,
         secor: clock.cenor,
 
-        // extras
+        // Extras
         julianDay: jd,
+        jdnNow,
+        elapsedSolions,
         elapsedDays,
         elapsedSecondsSolar,
         siderealRadians: clock.siderealRadians,
@@ -251,7 +278,7 @@ Date.prototype.toCTU = function () {
 Date.DEGREES_PER_HOUR = 360 / 24;
 
 // -----------------------------
-// Utility functions (unchanged)
+// Utility functions (unchanged style)
 // -----------------------------
 Date.prototype.getDayOfYear = function () {
     const onejan = new Date(this.getFullYear(), 0, 1);
@@ -261,6 +288,7 @@ Date.prototype.getDayOfYear = function () {
 Math.degToRad = function (num) {
     return num * Math.PI / 180;
 };
+
 Math.radToDeg = function (radians) {
     return radians * 180.0 / Math.PI;
 };
@@ -268,15 +296,19 @@ Math.radToDeg = function (radians) {
 Math.sinDeg = function (deg) {
     return Math.sin(deg * 2.0 * Math.PI / 360.0);
 };
+
 Math.acosDeg = function (x) {
     return Math.acos(x) * 360.0 / (2 * Math.PI);
 };
+
 Math.asinDeg = function (x) {
     return Math.asin(x) * 360.0 / (2 * Math.PI);
 };
+
 Math.tanDeg = function (deg) {
     return Math.tan(deg * 2.0 * Math.PI / 360.0);
 };
+
 Math.cosDeg = function (deg) {
     return Math.cos(deg * 2.0 * Math.PI / 360.0);
 };
@@ -287,7 +319,7 @@ Math.mod = function (a, b) {
     return result;
 };
 
-// Expose helpers if needed by other pages
+// Expose helpers if needed elsewhere
 window.date_compute = date_compute;
 window.ctu_pad2 = ctu_pad2;
 window.ctu_format_time = ctu_format_time;
