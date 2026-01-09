@@ -197,11 +197,20 @@ function date_compute(date) {
     if (Number.isNaN(d.getTime())) throw new Error("Invalid date for date_compute");
 
     const jd = d.toJulian();
+
+    // Jours entiers basculant à minuit :
+    const jdnNow = Math.floor(jd + 0.5);
+    const jdnOrigin = Math.floor(ORIGIN_UEC + 0.5);
+
+    // Nombre de solions écoulés (entier), bascule à minuit :
+    const elapsedSolions = jdnNow - jdnOrigin;
+
+    // Garde aussi elapsedDays (continu) si tu veux des fractions ailleurs :
     const elapsedDays = jd - ORIGIN_UEC;
 
     // Calendar
     const {solion, lunition, orbion} =
-        date_elapsedDaysToSolionLunionOrbion(elapsedDays);
+        date_elapsedDaysToSolionLunionOrbion(elapsedSolions);
 
     // Clock (sidereal)
     const clock = date_siderealClockFromJD(jd);

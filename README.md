@@ -44,7 +44,7 @@ Un **solion** n’est pas défini par un angle de rotation, mais par un événem
 L’horloge CTU mesure la **rotation sidérale de la Terre** de manière strictement angulaire.
 
 - **Decor**  
-  π / 10 radians de rotation terrestre
+  π / 10 radians de rotation sidérale de la Terre
 
 - **Milor**  
   π / 1000 radians
@@ -57,7 +57,7 @@ Relations internes :
 - 1 milor = 100 cenor
 - 1 decor = 10 000 cenor
 
-L’horloge est **décimale**, sans base 60.
+L’horloge est **décimale dans ses subdivisions**, sans base 60.
 
 > L’horloge mesure la rotation de la Terre.  
 > Le calendrier mesure le retour du Soleil.
@@ -121,7 +121,7 @@ The CTU clearly separates:
 
 #### Clock units (**-or**)
 
-- **Decor** = π / 10 radians of Earth rotation
+- **Decor** = π / 10 radians of the Earth's sidereal rotation
 - **Milor** = π / 1000 radians
 - **Cenor** = π / 100 000 radians
 
